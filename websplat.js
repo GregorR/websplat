@@ -1268,7 +1268,8 @@ var WebSplat = new (function() {
             addSprite(player);
 
             var keydown = function(ev) {
-                if (player.dead) return;
+                if (ev.ctrlKey || ev.altKey || ev.metaKey) return true;
+                if (player.dead) return true;
                 switch (ev.which) {
                     case 37: // left
                     case 65: // a
