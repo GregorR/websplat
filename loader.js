@@ -14,6 +14,7 @@
  */
 
 var WebSplatPony = "aj";
+var WebSplat = {};
 
 (function() {
     if ("WebSplat" in window) return;
