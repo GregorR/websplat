@@ -45,7 +45,7 @@
 
     function Favicon() {
         // first, look for a link tag
-        WebSplat.Sprite.call(this, "favicongoomba.php?domain=" + escape(document.domain) + "&frame=", faviconImageSets, true, true);
+        WebSplat.Sprite.call(this, "http://codu.org/websplat/favicongoomba.php?domain=" + escape(document.domain) + "&frame=", faviconImageSets, true, true);
         this.munching = false;
         this.xacc = 0;
         this.yacc = 0;
