@@ -101,13 +101,6 @@ var WebSplat = new (function() {
                 height: 62,
                 bb: [30, 46, 24, 36]
             },
-            f: { // flying
-                frames: 4,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            },
             z: { // zapped
                 frames: 2,
                 frameRate: 3,
