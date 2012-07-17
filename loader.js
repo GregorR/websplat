@@ -21,6 +21,7 @@ var WebSplatPony = "aj";
     window.WebSplat = {};
 
     var ponyIDs = ["ts", "rd", "aj", "pp", "r", "fs"];
+    var imageBase = "http://websplat.bitbucket.org/imgs/";
     var head;
 
     // debugging output
@@ -95,7 +96,9 @@ var WebSplatPony = "aj";
 
     // a header to say what's going on
     var hdr = document.createElement("div");
-    hdr.innerHTML = "Choose your hero!<br/><br/>";
+    var himg = document.createElement("img");
+    himg.src = imageBase + "choosethyhero.png";
+    hdr.appendChild(himg);
     selector.appendChild(hdr);
 
     // then offer the selections!
@@ -106,7 +109,7 @@ var WebSplatPony = "aj";
         var but = document.createElement("button");
         but.style.width = "68px";
         but.style.height = "62px";
-        but.style.background = "#dddddd url(http://websplat.bitbucket.org/imgs/" + pony + ".s0" + dir + ".png";
+        but.style.background = "#dddddd url(" + imageBase + pony + ".s0" + dir + ".png";
         but.onclick = (function(pony) { return function() {
             WebSplatPony = pony;
             head = document.getElementsByTagName("head")[0];
