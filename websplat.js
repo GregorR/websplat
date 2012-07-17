@@ -897,7 +897,9 @@ var WebSplat = new (function() {
 
         // if we need to hop, do so
         while (x != this.x &&
-            wpGetElementsByBoxThru(this, this.thru, false, x, this.w, this.y+this.h-wpConf.hopAbove, wpConf.hopAbove) !== null) {
+            this.collision(
+                wpGetElementsByBoxThru(this, this.thru, false, x, this.w, this.y+this.h-wpConf.hopAbove, wpConf.hopAbove),
+                0, ys, true) !== null) {
             this.y--;
         }
     
@@ -1094,6 +1096,7 @@ var WebSplat = new (function() {
     }
 
     Player.prototype.collision = function(els, xs, ys) {
+        if (els === null) return els;
         var rels = [];
         for (var i = 0; i < els.length; i++) {
             var el = els[i];

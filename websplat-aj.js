@@ -56,17 +56,18 @@
 
     // collisions with apple trees
     var oldpcoll = WebSplat.Player.prototype.collision;
-    WebSplat.Player.prototype.collision = function(els, xs, ys) {
+    WebSplat.Player.prototype.collision = function(els, xs, ys, hop) {
         // use the old one
         els = oldpcoll.apply(this, arguments);
         if (els === null) return els;
 
         // then get rid of trees
-        for (var i = 0; i < els.length; i++) {
-            if ("wpSprite" in els[i] && els[i].wpSprite.isTree) {
-                this.thru[els[i].wpID] = true;
-                els.splice(i, 1);
-                i--;
+        if (ys <= 0 || hop) {
+            for (var i = 0; i < els.length; i++) {
+                if ("wpSprite" in els[i] && els[i].wpSprite.isTree) {
+                    els.splice(i, 1);
+                    i--;
+                }
             }
         }
 
