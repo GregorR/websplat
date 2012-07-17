@@ -36,6 +36,9 @@ var WebSplat = new (function() {
         crouchThru: 10,
         hopAbove: 5, // how many pixels we can jump up without actually jumping
 
+        // frames to be zapped for
+        zapTime: 10,
+
         // time to be invincible for
         invTime: 1000,
 
@@ -100,6 +103,13 @@ var WebSplat = new (function() {
             },
             f: { // flying
                 frames: 4,
+                frameRate: 3,
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
+            },
+            z: { // zapped
+                frames: 2,
                 frameRate: 3,
                 width: 68,
                 height: 62,
@@ -632,8 +642,11 @@ var WebSplat = new (function() {
         this.yvel = 0;
         this.yacc = false; // less meaningful here
 
+        // are we being zapped?
+        this.zap = false;
+
         // what elements are left of us?
-        this.leftOf = null
+        this.leftOf = null;
 
         // what elements are right of us?
         this.rightOf = null;
@@ -726,6 +739,13 @@ var WebSplat = new (function() {
         }
 
         this.updateImagePrime();
+
+        // but forcibly be zapped if they say so
+        if (this.zap !== false) {
+            this.state = "z";
+            this.zap--;
+            if (this.zap <= 0) this.zap = false;
+        }
 
         // get the image and frame
         var imgSet = this.imageSets[this.state];
@@ -1097,6 +1117,8 @@ var WebSplat = new (function() {
 
     Player.prototype.takeDamage = function(from, pts) {
         if (this.dead) return false;
+
+        this.zap = wpConf.zapTime;
 
         if (!this.invincible) {
             this.hp -= pts;
