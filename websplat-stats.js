@@ -101,11 +101,13 @@
     }
 
     WebSplat.addHandler("postload", function(player) {
-        player.statNames = [];
-        player.stats = {};
+        if (!("statNames" in player)) {
+            player.statNames = [];
+            player.stats = {};
+            player.statDisplay = {};
+        }
         player.statTableEl = null;
         player.statTable = {};
-        player.statDisplay = {};
         player.statText = "";
 
         // only show HP if it's interesting

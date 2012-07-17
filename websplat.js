@@ -25,6 +25,7 @@ var WebSplat = new (function() {
         msPerTick: 30,
 
         gravity: 1,
+        flyMax: -10,
         runAcc: 1.5, // acceleration while running (on normal ground)
         runSlowAcc: 1.5, // slowdown while trying to stop running
         jumpAcc: 1.5, // acceleration mid-jump (magic)
@@ -91,6 +92,13 @@ var WebSplat = new (function() {
             },
             jc: { // jumping (3)
                 frames: 1,
+                frameRate: 3,
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
+            },
+            f: { // flying
+                frames: 4,
                 frameRate: 3,
                 width: 68,
                 height: 62,
@@ -615,7 +623,6 @@ var WebSplat = new (function() {
         this.xaccmax = false; // the maximum velocity we can get to by acceleration
         this.yvel = 0;
         this.yacc = false; // less meaningful here
-        this.yaccmax = false;
 
         // what elements are left of us?
         this.leftOf = null
@@ -787,12 +794,8 @@ var WebSplat = new (function() {
         // acceleration
         var yas = (this.yacc >= 0) ? 1 : -1;
         var xas = (this.xacc >= 0) ? 1 : -1;
-        if (this.yaccmax === false || this.yvel*yas < this.yaccmax*yas) {
-            this.yvel += realyacc;
-            if (this.yaccmax !== false && this.yvel*yas >= this.yaccmax*yas) {
-                this.yvel = this.yaccmax;
-            }
-        }
+        this.yvel += realyacc;
+        if (this.yvel < wpConf.flyMax) this.yvel = wpConf.flyMax;
         if (this.xacc === false) {
             // slow down!
             if (this.xvel > 0) {
@@ -937,6 +940,10 @@ var WebSplat = new (function() {
     function Player() {
         Sprite.call(this, WebSplatPony + ".", wpConf.playerImageSets, true, false);
 
+        // are we a pegasus?
+        if (WebSplatPony == "rd" || WebSplatPony == "fs")   this.pegasus = true;
+        else                                                this.pegasus = false;
+
         // we're still alive!
         this.dead = false;
         this.deathSpeed = 1;
@@ -982,14 +989,20 @@ var WebSplat = new (function() {
                 this.state = "da";
                 this.frame = 0;
             }
-        } else if (this.on === null) {
-            if (this.mode == "jfc") {
-                // crouching step of the fallthrough, crouch for 5 frames
+        } else if (this.on === null ||
+                   (this.mode == "fly" && this.yacc !== false)) {
+            if (this.mode == "fly") {
+                // flying, weeeh (but nothing to do here)
+                this.state = "f";
+
+            } else if (this.mode == "jfc") {
+                // crouching step of the fallthrough, crouch for 10 frames
                 if (this.frame >= 10) {
                     this.mode = "jf";
                     this.frame = 0;
                 }
                 this.state = "c";
+
             } else {
                 this.mode = "jf";
 
@@ -1285,7 +1298,6 @@ var WebSplat = new (function() {
             
                     case 38: // up
                     case 87: // w
-                    case 32: // space
                         if ("pressingUp" in player) break;
                         player.pressingUp = true;
                         if (player.on !== null) {
@@ -1310,9 +1322,15 @@ var WebSplat = new (function() {
                             player.on = null;
                         }
                         break;
-            
-                    default:
-                        return true;
+
+                    case 70: // f
+                    case 32: // space
+                        if (player.pegasus && player.yacc === false) {
+                            player.yacc = -wpConf.gravity*2;
+                            player.mode = "fly";
+                            player.frame = 0;
+                        }
+                        break;
                 }
             
                 ev.stopPropagation();
@@ -1341,16 +1359,17 @@ var WebSplat = new (function() {
             
                     case 38: // up
                     case 87: // w
-                    case 32: // space
                         delete player.pressingUp;
                         break;
             
                     case 40: // down
                     case 83: // s
                         break;
-            
-                    default:
-                        return true;
+
+                    case 70: // f
+                    case 32: // space
+                        player.yacc = false;
+                        break;
                 }
             
                 ev.stopPropagation();
