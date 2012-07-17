@@ -107,8 +107,8 @@
             scriptChain([
                 "http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js",
                 "websplat.js",
-                "websplat-skulldog.js",
-                "websplat-favicongoomba.js",
+                /*"websplat-skulldog.js",
+                "websplat-favicongoomba.js",*/
                 "websplat-stats.js",
                 "websplat-" + game + ".js",
                 "go.js"

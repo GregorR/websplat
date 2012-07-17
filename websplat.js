@@ -43,101 +43,86 @@ var WebSplat = new (function() {
             s: { // still
                 frames: 1,
                 frameRate: 3,
-                width: 10,
-                height: 40,
-                bb: [1, 2, 5, 8]
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
             },
             c: { // crouching
                 frames: 1,
                 frameRate: 3,
-                width: 20,
-                height: 40,
-                bb: [2, 4, 8, 11]
-            },
-            k: { // kneeling
-                frames: 1,
-                frameRate: 3,
-                width: 50,
-                height: 49
-            },
-            cr: { // crawling
-                frames: 1,
-                frameRate: 3,
-                width: 50,
-                height: 49
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
             },
             r: { // running
-                frames: 4,
+                frames: 6,
                 frameRate: 3,
-                width: 20,
-                height: 40,
-                bb: [6, 12, 5, 8]
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
             },
             rs: { // sliding
                 frames: 1,
                 frameRate: 3,
-                width: 20,
-                height: 40,
-                bb: [6, 12, 5, 8]
-
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
             },
             rt: { // turning
                 frames: 1,
                 frameRate: 3,
-                width: 20,
-                height: 40,
-                bb: [6, 12, 5, 8]
-
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
             },
-            ja: { // jumping (fast)
+            ja: { // jumping (1)
                 frames: 1,
                 frameRate: 3,
-                width: 20,
-                height: 49,
-                bb: [6, 12, 14, 17]
-
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
             },
-            jb: { // jumping (slow)
+            jb: { // jumping (2)
                 frames: 1,
                 frameRate: 3,
-                width: 20,
-                height: 49,
-                bb: [6, 12, 14, 17]
-
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
             },
-            fa: { // falling (fast)
-                frames: 2,
-                frameRate: 3,
-                width: 20,
-                height: 49,
-                bb: [6, 12, 14, 17]
-
-            },
-            fb: { // falling (slow)
+            jc: { // jumping (3)
                 frames: 1,
                 frameRate: 3,
-                width: 20,
-                height: 49,
-                bb: [6, 12, 14, 17]
-
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
             },
             da: { // dying (a)
                 frames: 1,
                 frameRate: 3,
-                width: 50,
-                height: 49
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
             },
             db: { // dying (b)
                 frames: 1,
                 frameRate: 3,
-                width: 50,
-                height: 49
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
             },
-            dc: { // dead
+            dc: { // dying (c)
                 frames: 1,
                 frameRate: 3,
-                width: 50,
-                height: 49
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
+            },
+            dd: { // dead
+                frames: 1,
+                frameRate: 3,
+                width: 68,
+                height: 62,
+                bb: [30, 46, 24, 36]
             }
         },
 
@@ -738,9 +723,8 @@ var WebSplat = new (function() {
 
         // and bounding boxes can be reduced
         var bb = [1, 2, 1, 2];
-        if ("bb" in imgSet) {
+        if ("bb" in imgSet)
             bb = imgSet.bb;
-        }
         this.xioff = bb[0];
         this.yioff = bb[2];
 
@@ -951,7 +935,7 @@ var WebSplat = new (function() {
     // the player (sprite)
     Sprite.prototype.isPlayer = false;
     function Player() {
-        Sprite.call(this, "g", wpConf.playerImageSets, true, false);
+        Sprite.call(this, "aj.", wpConf.playerImageSets, true, false);
 
         // we're still alive!
         this.dead = false;
@@ -984,30 +968,18 @@ var WebSplat = new (function() {
         if (this.dead) {
             if (this.frame < this.deathSpeed) return;
 
-            // ? -> c -> k -> cr -> da -> db -> dc
-            if (this.state == "c") {
-                // FIXME: Should have this shift be configurable
-                if (this.dir == "r") {
-                    this.x += 30;
-                } else {
-                    this.x -= 30;
-                }
-                this.state = "k";
-                this.frame = 0;
-            } else if (this.state == "k") {
-                this.state = "cr";
-                this.frame = 0;
-            } else if (this.state == "cr") {
-                this.state = "da";
-                this.frame = 0;
-            } else if (this.state == "da") {
+            // da -> db -> dc -> dd
+            if (this.state == "da") {
                 this.state = "db";
                 this.frame = 0;
             } else if (this.state == "db") {
                 this.state = "dc";
                 this.frame = 0;
-            } else if (this.state != "dc") {
-                this.state = "c";
+            } else if (this.state == "dc") {
+                this.state = "dd";
+                this.frame = 0;
+            } else if (this.state != "dd") {
+                this.state = "da";
                 this.frame = 0;
             }
         } else if (this.on === null) {
@@ -1021,18 +993,13 @@ var WebSplat = new (function() {
             } else {
                 this.mode = "jf";
 
-                // flying or falling, take your pick
-                if (this.xvel == 0) {
-                    // if we're not moving horizontally, all the frames look weird
-                    this.state = "fb";
-                } else if (this.yvel > 5) {
-                    this.state = "fa";
-                } else if (this.yvel > 0) {
-                    this.state = "fb";
-                } else if (this.yvel < -10) {
-                    this.state = "ja";
-                } else if (this.yvel < -0) {
+                if (Math.abs(this.yvel) < 3) {
+                    // middle frame
                     this.state = "jb";
+                } else if (this.yvel < 0) {
+                    this.state = "ja";
+                } else {
+                    this.state = "jc";
                 }
             }
         } else if (this.xacc != 0 || this.xvel != 0) {
