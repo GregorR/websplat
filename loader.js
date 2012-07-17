@@ -109,7 +109,12 @@ var WebSplatPony = "aj";
         var but = document.createElement("button");
         but.style.width = "68px";
         but.style.height = "62px";
-        but.style.background = "#dddddd url(" + imageBase + pony + ".s0" + dir + ".png";
+        but.style.background = "#dddddd";
+        but.style.margin = "0px";
+        but.style.padding = "0px";
+        var bimg = document.createElement("img");
+        bimg.src = imageBase + pony + ".s0" + dir + ".png";
+        but.appendChild(bimg);
         but.onclick = (function(pony) { return function() {
             WebSplatPony = pony;
             head = document.getElementsByTagName("head")[0];
