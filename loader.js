@@ -13,9 +13,10 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
+var WebSplatPony = "aj";
+
 (function() {
-    var gameNames = ["imagecollect"];
-    var games = {"imagecollect": "Image collection"};
+    var ponyIDs = ["ts", "rd", "aj", "pp", "r", "fs"];
     var head;
 
     // debugging output
@@ -81,6 +82,7 @@
 
     // make a frame to offer selections in
     var selector = document.createElement("div");
+    selector.style.backgroundColor = "#aaaaaa";
     selector.style.color = "black";
     selector.style.textAlign = "center";
     selector.style.borderBottom = "1px solid black";
@@ -89,17 +91,18 @@
 
     // a header to say what's going on
     var hdr = document.createElement("div");
-    hdr.innerHTML = "Which game would you like to play?";
+    hdr.innerHTML = "Choose your hero!<br/>";
     selector.appendChild(hdr);
 
     // then offer the selections!
-    for (var i = 0; i < gameNames.length; i++) {
-        var game = gameNames[i];
-        var gameDisp = games[game];
+    for (var i = 0; i < ponyIDs.length; i++) {
+        var pony = ponyIDs[i];
+        var dir = (i >= ponyIDs.length / 2) ? "l" : "r";
 
-        var but = document.createElement("button");
-        but.innerHTML = gameDisp;
-        but.onclick = function() {
+        var but = document.createElement("img");
+        but.src = "http://websplat.bitbucket.org/imgs/" + pony + ".s0" + dir + ".png";
+        but.onclick = (function(pony) { return function() {
+            WebSplatPony = pony;
             head = document.getElementsByTagName("head")[0];
             selector.style.display = "none";
 
@@ -107,14 +110,11 @@
             scriptChain([
                 "http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js",
                 "websplat.js",
-                /*"websplat-skulldog.js",
-                "websplat-favicongoomba.js",*/
                 "websplat-stats.js",
-                "websplat-" + game + ".js",
+                "websplat-imagecollect.js",
                 "go.js"
             ]);
-        }
+        }; })(pony);
         selector.appendChild(but);
-        if (i == 0) but.focus();
     }
 })();

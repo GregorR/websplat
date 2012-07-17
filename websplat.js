@@ -935,7 +935,7 @@ var WebSplat = new (function() {
     // the player (sprite)
     Sprite.prototype.isPlayer = false;
     function Player() {
-        Sprite.call(this, "aj.", wpConf.playerImageSets, true, false);
+        Sprite.call(this, WebSplatPony + ".", wpConf.playerImageSets, true, false);
 
         // we're still alive!
         this.dead = false;
