@@ -16,6 +16,8 @@
 var WebSplatPony = "aj";
 
 (function() {
+    if ("WebSplat" in window) return;
+
     var ponyIDs = ["ts", "rd", "aj", "pp", "r", "fs"];
     var head;
 
