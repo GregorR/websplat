@@ -82,7 +82,7 @@ var WebSplatPony = "aj";
 
     // make a frame to offer selections in
     var selector = document.createElement("div");
-    selector.style.backgroundColor = "#aaaaaa";
+    selector.style.backgroundColor = "white";
     selector.style.color = "black";
     selector.style.textAlign = "center";
     selector.style.borderBottom = "1px solid black";
@@ -91,7 +91,7 @@ var WebSplatPony = "aj";
 
     // a header to say what's going on
     var hdr = document.createElement("div");
-    hdr.innerHTML = "Choose your hero!<br/>";
+    hdr.innerHTML = "Choose your hero!<br/><br/>";
     selector.appendChild(hdr);
 
     // then offer the selections!
@@ -99,8 +99,10 @@ var WebSplatPony = "aj";
         var pony = ponyIDs[i];
         var dir = (i >= ponyIDs.length / 2) ? "l" : "r";
 
-        var but = document.createElement("img");
-        but.src = "http://websplat.bitbucket.org/imgs/" + pony + ".s0" + dir + ".png";
+        var but = document.createElement("button");
+        but.style.width = "68px";
+        but.style.height = "62px";
+        but.style.background = "#dddddd url(http://websplat.bitbucket.org/imgs/" + pony + ".s0" + dir + ".png";
         but.onclick = (function(pony) { return function() {
             WebSplatPony = pony;
             head = document.getElementsByTagName("head")[0];
@@ -116,5 +118,7 @@ var WebSplatPony = "aj";
             ]);
         }; })(pony);
         selector.appendChild(but);
+        selector.appendChild(document.createTextNode(" "));
+        if (i == 0) but.focus();
     }
 })();
