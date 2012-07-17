@@ -34,8 +34,10 @@
         this.xacc = 0;
         this.updateImage();
     }
+    WebSplat.Sprite.prototype.isGoody = false;
     WebSplat.Sprite.prototype.isApple = false;
     Apple.prototype = new WebSplat.SpriteChild();
+    Apple.prototype.isGoody = true;
     Apple.prototype.isApple = true;
 
     // Buy some apples!

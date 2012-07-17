@@ -18,6 +18,7 @@
     var diamondDogConf = {
         dogs: ["dda.", "ddb.", "ddc."],
         moveSpeed: 3,
+        pointsPerKill: 500,
         edgeDetectDist: 5,
         edgeDetectSize: 10 /* hopAbove*2 */
     }
@@ -84,6 +85,20 @@
     DiamondDog.prototype = new WebSplat.SpriteChild();
     DiamondDog.prototype.isBaddy = true;
 
+    // don't collide with goodies
+    DiamondDog.prototype.collision = function(els, xs, ys) {
+        var rels = [];
+        for (var i = 0; i < els.length; i++) {
+            if ("wpSprite" in els[i] && els[i].wpSprite.isGoody) {
+                this.thru[els.wpID] = true;
+            } else {
+                rels.push(els[i]);
+            }
+        }
+        if (rels.length === 0) return null;
+        return rels;
+    }
+
     // every tick, change the acceleration inexplicably
     DiamondDog.prototype.tick = function() {
         if (!this.onScreen()) return;
@@ -146,6 +161,11 @@
         this.frame = 0;
         this.updateImage();
 
+        // points for the player
+        if ("getPoints" in from) {
+            from.getPoints(diamondDogConf.pointsPerKill);
+        }
+
         // then remove it
         var spthis = this;
         WebSplat.deplatformSprite(spthis);
@@ -160,7 +180,7 @@
         var minY = 240;
         var maxY = WebSplat.conf.maxY-minY;
         // create some diamond dogs!
-        var sdc = Math.ceil((WebSplat.conf.maxX*maxY)/(640*960));
+        var sdc = Math.ceil((WebSplat.conf.maxX*maxY)/(640*480));
         for (var i = 0; i < sdc; i++) {
             var b = new DiamondDog();
             b.setXY(Math.random()*WebSplat.conf.maxX, Math.random()*maxY+minY);

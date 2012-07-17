@@ -925,7 +925,7 @@ var WebSplat = new (function() {
 
     // override if you need it
     Sprite.prototype.postAcc = function() {}
-    Sprite.prototype.collision = function(els, xs, ys) {}
+    Sprite.prototype.collision = function(els, xs, ys) {return els;}
     Sprite.prototype.hitBottom = function() {}
     Sprite.prototype.takeDamage = function(from, pts) {return false;} // returns true if killed
     Sprite.prototype.doDamage = function(to, pts) {}
