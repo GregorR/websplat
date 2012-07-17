@@ -829,12 +829,13 @@ var WebSplat = new (function() {
             realxacc *= wpConf.runAcc;
             slowxacc *= wpConf.runSlowAcc;
         }
-        var realyacc = this.hasGravity ? wpConf.gravity : 0;
+        var appgravity = this.hasGravity ? ("ownGravity" in this) ? this.ownGravity : wpConf.gravity : 0;
+        var gravs = (appgravity >= 0) ? 1 : -1;
+        var realyacc = appgravity;
         if (this.yacc !== false) realyacc += this.yacc;
  
 
         // acceleration
-        var yas = (this.yacc >= 0) ? 1 : -1;
         var xas = (this.xacc >= 0) ? 1 : -1;
         this.yvel += realyacc;
         if (this.yvel < wpConf.flyMax) this.yvel = wpConf.flyMax;
@@ -912,7 +913,7 @@ var WebSplat = new (function() {
                 if (morels != null) els.push.apply(els, morels);
 
                 // then fail
-                if (ys >= 0) {
+                if (ys*gravs >= 0) {
                     this.on = els;
                 } else {
                     this.above = els;
