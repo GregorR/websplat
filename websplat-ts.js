@@ -62,7 +62,7 @@
             keyDown = true;
             var to = [
                 WebSplat.getRandomInt(0, WebSplat.conf.maxX),
-                WebSplat.getRandomInt(0, WebSplat.conf.maxY - 240)
+                WebSplat.getRandomInt(0, this.y)
             ];
 
             // place the teleport sprites
