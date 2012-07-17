@@ -940,6 +940,7 @@ var WebSplat = new (function() {
             if (this.rightOf === null) this.rightOf = [];
             x = maxX - this.w;
         }
+        if (y < -240) y = -240;
         if (y + this.h > maxY + 100) {
             if (this.on === null) this.on = [];
             y = maxY - this.h + 100;
