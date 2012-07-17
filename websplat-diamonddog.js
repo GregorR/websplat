@@ -90,7 +90,7 @@
         var rels = [];
         for (var i = 0; i < els.length; i++) {
             if ("wpSprite" in els[i] && els[i].wpSprite.isGoody) {
-                this.thru[els.wpID] = true;
+                this.thru[els[i].wpID] = true;
             } else {
                 rels.push(els[i]);
             }
