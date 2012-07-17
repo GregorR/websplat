@@ -23,11 +23,6 @@
         edgeDetectSize: 10 /* hopAbove*2 */
     }
 
-    function getRandomInt(min, max)
-    {
-        return Math.floor(Math.random() * (max - min)) + min;
-    }
-
     var diamondDogImageSets = {
         s: {
             frames: 3,
@@ -76,7 +71,7 @@
     function DiamondDog() {
         this.mode = this.state = "r";
         WebSplat.Sprite.call(this,
-            diamondDogConf.dogs[getRandomInt(0, diamondDogConf.dogs.length)],
+            diamondDogConf.dogs[WebSplat.getRandomInt(0, diamondDogConf.dogs.length)],
             diamondDogImageSets, true, true);
         this.munching = false;
         this.xacc = 0;

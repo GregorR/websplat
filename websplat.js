@@ -176,6 +176,11 @@ var WebSplat = new (function() {
         return ret;
     }
 
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+    this.getRandomInt = getRandomInt;
+
     // globals
     var maxX = 0;
     var maxY = 0;
