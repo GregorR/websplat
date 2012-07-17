@@ -37,7 +37,7 @@ var WebSplat = new (function() {
         // time to be invincible for
         invTime: 1000,
 
-        imageBase: "http://websplat.bitbucket.org/websplat/imgs/",
+        imageBase: "http://websplat.bitbucket.org/imgs/",
 
         playerImageSets: {
             s: { // still
