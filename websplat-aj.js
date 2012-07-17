@@ -41,7 +41,8 @@
         if (!keyDown) {
             keyDown = true;
             var b = new AppleTree();
-            b.setXY(this.x, this.y - appletreeImageSets.s.height);
+            b.setXY(this.x - (appletreeImageSets.s.width-appletreeImageSets.s.bb[0])/2 + (this.w+this.xioff)/2,
+                this.y - appletreeImageSets.s.height + this.h + this.yioff);
             WebSplat.addSprite(b);
 
             setTimeout(function() {
