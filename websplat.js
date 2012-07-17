@@ -730,8 +730,18 @@ var WebSplat = new (function() {
 
         // and bounding boxes can be reduced
         var bb = [1, 2, 1, 2];
-        if ("bb" in imgSet)
+        if ("bb" in imgSet) {
             bb = imgSet.bb;
+            if (this.dir == "l") {
+                if ("bbl" in imgSet) {
+                    bb = imgSet.bbl;
+                } else {
+                    bb = bb.slice(0);
+                    bb[0] = bb[1] - bb[0];
+                    imgSet.bbl = bb;
+                }
+            }
+        }
         this.xioff = bb[0];
         this.yioff = bb[2];
 
