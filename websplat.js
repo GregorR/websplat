@@ -1161,6 +1161,11 @@ var WebSplat = new (function() {
         return false;
     }
 
+    Player.prototype.getHP = function(pts) {
+        this.hp += pts;
+        if (this.hp > this.maxHP) this.hp = this.maxHP;
+    }
+
     Player.prototype.doDamage = function(to, pts) {}
     Player.prototype.onChangeHP = function() {}
     Player.prototype.specialOn = function() {}
