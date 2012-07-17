@@ -22,7 +22,7 @@
         if (!("wpSprite" in el)) return;
         var sprite = el.wpSprite;
         if (!sprite.isBaddy) return;
-        if (player.dead) return;
+        if (sprite.dead || player.dead) return;
 
         // OK, this is a player-baddy collision!
         if (ys > 0) {

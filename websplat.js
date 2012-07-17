@@ -505,12 +505,19 @@ var WebSplat = new (function() {
     }
     this.addSprite = addSprite;
 
+    // deplatform a sprite
+    function deplatformSprite(sprite) {
+        if (sprite.isPlatform) {
+            remElementPosition(sprite.el);
+            sprite.isPlatform = false;
+        }
+    }
+    this.deplatformSprite = deplatformSprite;
+
     // remove a sprite from the sprite list
     function remSprite(sprite) {
         // if it's a platform, remove that first
-        if (sprite.isPlatform) {
-            remElementPosition(sprite.el);
-        }
+        deplatformSprite(sprite);
 
         // then remove it from the list
         var osprites = [];
