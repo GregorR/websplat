@@ -113,7 +113,7 @@ var WebSplatPony = "aj";
         but.style.margin = "0px";
         but.style.padding = "0px";
         var bimg = document.createElement("img");
-        bimg.src = imageBase + pony + ".s0" + dir + ".png";
+        bimg.src = imageBase + pony + ".ranim" + dir + ".gif";
         but.appendChild(bimg);
         but.onclick = (function(pony) { return function() {
             WebSplatPony = pony;
