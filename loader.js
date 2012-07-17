@@ -122,6 +122,7 @@ var WebSplatPony = "aj";
                 "websplat-stats.js",
                 "websplat-points.js",
                 "websplat-apples.js",
+                "websplat-" + pony + ".js",
                 "websplat-baddy.js",
                 "websplat-diamonddog.js",
                 "go.js"

@@ -1154,15 +1154,10 @@ var WebSplat = new (function() {
         return false;
     }
 
-    Player.prototype.doDamage = function(to, pts) {
-        /*if (Math.random()*3 < 1) {
-            this.hp++;
-            if (this.hp > this.maxHP) this.hp = this.maxHP;
-        }
-        this.onChangeHP();*/
-    }
-
+    Player.prototype.doDamage = function(to, pts) {}
     Player.prototype.onChangeHP = function() {}
+    Player.prototype.specialOn = function() {}
+    Player.prototype.specialOff = function() {}
 
 
     // do these two boxes intersect?
@@ -1365,11 +1360,7 @@ var WebSplat = new (function() {
 
                     case 70: // f
                     case 32: // space
-                        if (player.pegasus && player.yacc === false) {
-                            player.yacc = -wpConf.gravity*2;
-                            player.mode = "fly";
-                            player.frame = 0;
-                        }
+                        player.specialOn();
                         break;
                 }
             
@@ -1408,7 +1399,7 @@ var WebSplat = new (function() {
 
                     case 70: // f
                     case 32: // space
-                        player.yacc = false;
+                        player.specialOff();
                         break;
                 }
             
