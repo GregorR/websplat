@@ -87,6 +87,7 @@
 
     // don't collide with goodies
     DiamondDog.prototype.collision = function(els, xs, ys) {
+        if (els === null) return els;
         var rels = [];
         for (var i = 0; i < els.length; i++) {
             if ("wpSprite" in els[i] && els[i].wpSprite.isGoody) {

@@ -548,43 +548,54 @@ var WebSplat = new (function() {
 
     // perform a tick for every sprite
     function spritesTick() {
-        if (refTime === null) {
-            refTime = new Date().getTime();
-            tickNo = 1;
-        } else {
-            tickNo++;
+        var tries = 0;
+        retry: while (true) {
+            if (refTime === null) {
+                refTime = new Date().getTime();
+                tickNo = 1;
+            } else {
+                tickNo++;
 
-            // see if we're too early
-            while (new Date().getTime() < nextTime) {}
-        }
-
-        callHandlers("ontick", [this]);
-
-        if (sprites.length == 0) {
-            // time to stop!
-            if (gameTimer !== null) {
-                clearTimeout(gameTimer);
-                gameTimer = refTime = null;
+                // see if we're too early
+                while (new Date().getTime() < nextTime) {}
             }
 
-        } else {
-            // tick every sprite
-            for (var i = 0; i < sprites.length; i++) {
-                sprites[i].tick();
+            callHandlers("ontick", [this]);
+
+            if (sprites.length == 0) {
+                // time to stop!
+                if (gameTimer !== null) {
+                    clearTimeout(gameTimer);
+                    gameTimer = refTime = null;
+                }
+
+            } else {
+                // tick every sprite
+                for (var i = 0; i < sprites.length; i++) {
+                    sprites[i].tick();
+                }
+
             }
 
-        }
+            var cur = new Date().getTime();
+            var next = nextTime = refTime + tickNo*wpConf.msPerTick;
+            var ms = 0;
+            if (cur <= next) {
+                ms = next - cur;
+            } else if (cur > next + 200) {
+                // bleh
+                refTime = null;
+            }
 
-        var cur = new Date().getTime();
-        var next = nextTime = refTime + tickNo*wpConf.msPerTick;
-        var ms = 0;
-        if (cur <= next) {
-            ms = next - cur;
-        } else if (cur > next + 200) {
-            // bleh
-            refTime = null;
+            tries++;
+            if (ms < 0 && tries < 10) {
+                continue retry;
+            } else {
+                gameTimer = setTimeout(spritesTick, ms);
+            }
+
+            break;
         }
-        gameTimer = setTimeout(spritesTick, ms);
     }
 
     // start the sprite timer
