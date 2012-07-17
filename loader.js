@@ -116,7 +116,8 @@ var WebSplatPony = "aj";
                 "http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js",
                 "websplat.js",
                 "websplat-stats.js",
-                "websplat-imagecollect.js",
+                "websplat-points.js",
+                "websplat-apples.js",
                 "go.js"
             ]);
         }; })(pony);

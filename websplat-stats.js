@@ -143,15 +143,14 @@
             }
             if (el == "statEl") {
                 player[el].style.right = "0px";
-                player[el].style.paddingRight = "15px";
                 player[el].style.borderLeft = "1px solid black";
             } else {
                 player[el].style.left = "0px";
-                player[el].style.padding = "4px";
                 player[el].style.borderRight = "1px solid black";
             }
             player[el].style.top = "0px";
             player[el].style.borderBottom = "1px solid black";
+            player[el].style.padding = "4px";
             player[el].style.zIndex = "1000000";
             player[el].wpIgnore = true;
             document.body.appendChild(player[el]);
