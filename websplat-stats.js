@@ -34,7 +34,6 @@
     document.getElementsByTagName("head")[0].appendChild(statStyle);
 
     WebSplat.Player.prototype.onChangeHP = function() {
-        this.stats.HP = this.hp + "/" + this.maxHP;
         this.updateStats();
     }
 
@@ -54,6 +53,17 @@
             }
 
             break;
+        }
+
+        // update HP
+        if ("statHPEl" in this) {
+            var i;
+            for (i = 0; i < this.hp; i++) {
+                this.statHeartEls[i].style.visibility = "visible";
+            }
+            for (; i < this.maxHP; i++) {
+                this.statHeartEls[i].style.visibility = "hidden";
+            }
         }
     }
 
@@ -110,33 +120,55 @@
         player.statTable = {};
         player.statText = "";
 
+        var els = ["statEl"];
+
         // only show HP if it's interesting
+        if (player.maxHP > 1)
+            els.push("statHPEl");
+
+        // make the stats elements
+        for (var eli = 0; eli < els.length; eli++) {
+            var el = els[eli];
+            player[el] = document.createElement("span");
+            $(player[el]).addClass("statBox");
+
+            if (!cssOK) {
+                // probably IE (yukk), make it scroll through stupidity
+                player[el].style.position = "absolute";
+                player[el].style.backgroundColor = "black";
+                player[el].style.color = "white";
+                $(window).scroll((function(el) { return function() {
+                    $(player[el]).css("top", $(window).scrollTop() + "px");
+                }; })(el));
+            }
+            if (el == "statEl") {
+                player[el].style.right = "0px";
+                player[el].style.paddingRight = "15px";
+                player[el].style.borderLeft = "1px solid black";
+            } else {
+                player[el].style.left = "0px";
+                player[el].style.padding = "4px";
+                player[el].style.borderRight = "1px solid black";
+            }
+            player[el].style.top = "0px";
+            player[el].style.borderBottom = "1px solid black";
+            player[el].style.zIndex = "1000000";
+            player[el].wpIgnore = true;
+            document.body.appendChild(player[el]);
+        }
+
+        // make hearts if we need them
         if (player.maxHP > 1) {
-            player.statNames.push("HP");
-            player.stats.HP = player.hp;
+            player.statHeartEls = [];
+            for (var i = 0; i < player.maxHP; i++) {
+                if (i != 0) player.statHPEl.appendChild(document.createTextNode(" "));
+                var heart = document.createElement("img");
+                heart.src = WebSplat.conf.imageBase + "heart.png";
+                player.statHPEl.appendChild(heart);
+                player.statHeartEls.push(heart);
+            }
         }
 
-        // put the stats element in the upper-left corner
-        player.statEl = document.createElement("span");
-        $(player.statEl).addClass("statBox");
-
-        if (!cssOK) {
-            // probably IE (yukk), make it scroll through stupidity
-            player.statEl.style.position = "absolute";
-            player.statEl.style.backgroundColor = "black";
-            player.statEl.style.color = "white";
-            $(window).scroll(function() {
-                $(player.statEl).css("top", $(window).scrollTop() + "px");
-            });
-        }
-        player.statEl.style.right = "0px";
-        player.statEl.style.top = "0px";
-        player.statEl.style.paddingRight = "15px";
-        player.statEl.style.zIndex = "1000000";
-        player.statEl.style.borderLeft = "1px solid black";
-        player.statEl.style.borderBottom = "1px solid black";
-        player.statEl.wpIgnore = true;
         player.updateStats();
-        document.body.appendChild(player.statEl);
     });
 })();

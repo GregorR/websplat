@@ -957,8 +957,8 @@ var WebSplat = new (function() {
         // we're still alive!
         this.dead = false;
         this.deathSpeed = 1;
-        this.hp = 1;
-        this.maxHP = 1;
+        this.hp = 6;
+        this.maxHP = 6;
         this.invincible = false;
         this.invTimer = null;
     
@@ -1125,11 +1125,11 @@ var WebSplat = new (function() {
     }
 
     Player.prototype.doDamage = function(to, pts) {
-        if (Math.random()*3 < 1) {
+        /*if (Math.random()*3 < 1) {
             this.hp++;
             if (this.hp > this.maxHP) this.hp = this.maxHP;
         }
-        this.onChangeHP();
+        this.onChangeHP();*/
     }
 
     Player.prototype.onChangeHP = function() {}
