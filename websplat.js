@@ -37,7 +37,7 @@ var WebSplat = new (function() {
         // time to be invincible for
         invTime: 1000,
 
-        imageBase: "http://codu.org/websplat/imgs/",
+        imageBase: "http://websplat.bitbucket.org/websplat/imgs/",
 
         playerImageSets: {
             s: { // still
@@ -656,7 +656,11 @@ var WebSplat = new (function() {
                     for (var i = 0; i < imgSet.frames; i++) {
                         if ("frameAliases" in imgSet && imgSet.frameAliases[i] != i) continue;
                         var img = new Image();
-                        img.src = wpConf.imageBase + imageBase + state + i + dir + ".png";
+                        if (imageBase.match(/\/\//)) {
+                            img.src = imageBase + state + i + dir + ".png";
+                        } else {
+                            img.src = wpConf.imageBase + imageBase + state + i + dir + ".png";
+                        }
                         images[state + i + dir] = img;
                     }
                 }

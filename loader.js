@@ -55,7 +55,7 @@
         var src = srcs.shift();
 
         var script = document.createElement("script");
-        if (src.match(/\//) {
+        if (src.match(/\/\//)) {
             script.src = src;
         } else {
             script.src = "http://websplat.bitbucket.org/websplat/" + src;
