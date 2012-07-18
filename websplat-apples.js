@@ -22,9 +22,8 @@
         s: {
             frames: 1,
             frameRate: 3,
-            width: 7,
-            height: 8,
-            bb: [-4, -8, -4, -8]
+            width: 14,
+            height: 16
         }
     }
 

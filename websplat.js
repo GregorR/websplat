@@ -689,10 +689,11 @@ var WebSplat = new (function() {
         }
 
         // create the img element that is the actual display of the sprite
-        this.el = document.createElement("img");
+        this.el = document.createElement("canvas");
         this.el.wpSprite = this;
+        this.el.style.padding = this.el.style.margin = "0px";
 
-        this.el.src = this.getImage(this.state, "r", 0);
+        this.draw(this.state, "r", 0);
 
         this.el.style.color = "black";
         this.el.style.position = "absolute";
@@ -724,9 +725,23 @@ var WebSplat = new (function() {
     this.SpriteChild = SpriteChild;
     SpriteChild.prototype = Sprite.prototype;
 
-    // (private) get one of the images
-    Sprite.prototype.getImage = function(state, dir, num) {
-        return this.images[state + num + dir].src;
+    // (private) draw an image
+    Sprite.prototype.draw = function(state, dir, num) {
+        var imgSet = this.imageSets[state];
+        this.el.width = imgSet.width;
+        this.el.height = imgSet.height;
+        this.el.style.width = imgSet.width + "px";
+        this.el.style.height = imgSet.height + "px";
+
+        var img = this.images[state + num + dir];
+        if (!("complete" in img) ||
+            (img.complete && img.width > 0 && img.height > 0)) {
+            this.el.style.border = "0px";
+            var ctx = this.el.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+        } else {
+            this.el.style.border = "1px solid red";
+        }
     }
 
     // usually part of tick, update the image
@@ -781,10 +796,7 @@ var WebSplat = new (function() {
         this.xioff = bb[0];
         this.yioff = bb[2];
 
-        var newi = this.getImage(this.state, this.dir, frame);
-        if (this.el.src != newi) {
-            this.el.src = newi;
-        }
+        this.draw(this.state, this.dir, frame);
 
         // and check for width/height changes
         if (this.w != imgSet.width - bb[1]) {
