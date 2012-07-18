@@ -116,7 +116,7 @@
             placeGem(gems[7], loc[0], loc[1], -gemSpeedH, -gemSpeedH);
 
             // then move
-            if (!this.powerJump) {
+            if (!this.powerJump && this.y > 0) {
                 this.yvel = -WebSplat.conf.gravity*2;
                 this.forceyvel = -gemJumpSpeed;
                 this.jump = 1;
