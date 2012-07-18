@@ -577,17 +577,16 @@ var WebSplat = new (function() {
 
             var cur = new Date().getTime();
             var next = nextTime = refTime + tickNo*wpConf.msPerTick;
-            var ms = 0;
-            if (cur <= next) {
-                ms = next - cur;
-            } else if (cur > next + 200) {
-                // bleh
-                refTime = null;
-            }
+            var ms = next - cur;
 
-            tries++;
-            if (ms < 0 && tries < 10) {
-                continue retry;
+            if (ms < 0) {
+                tries++;
+                if (tries < 3) {
+                    continue retry;
+                } else {
+                    if (ms < -250) refTime = null;
+                    gameTimer = setTimeout(spritesTick, 0);
+                }
             } else {
                 gameTimer = setTimeout(spritesTick, ms);
             }
@@ -821,6 +820,8 @@ var WebSplat = new (function() {
 
     // perform a tick of this sprite
     Sprite.prototype.tick = function() {
+        if (!this.onScreen()) return;
+
         this.updateImage();
 
         // get the acceleration from our platform
