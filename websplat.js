@@ -820,7 +820,7 @@ var WebSplat = new (function() {
 
     // perform a tick of this sprite
     Sprite.prototype.tick = function() {
-        if (!this.onScreen()) return;
+        if (!this.onScreen() && !this.isPlayer) return;
 
         this.updateImage();
 
