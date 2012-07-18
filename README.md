@@ -20,7 +20,7 @@ make modifications, here's how:
 
 4. Use the following bookmarklet:
 
-        javascript:(function(){var%20script=document.createElement('script');script.src='http://localhost:8080/loader.js';document.getElementsByTagName('head')[0].appendChild(script);})()
+        javascript:(function(s){s=document.createElement('script');s.src='http://localhost:8080/loader.js';document.getElementsByTagName('head')[0].appendChild(s);})()
 
 When you have it working, it should be easy enough to figure out how to modify
 loader.js, websplat.js and the bookmarklet to refer to your new instance.
