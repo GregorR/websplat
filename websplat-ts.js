@@ -29,7 +29,7 @@
         WebSplat.Sprite.call(this, "tport.", teleportImageSets, false, false);
         this.xacc = 0;
         this.updateImage();
-        this.el.style.visility = "hidden";
+        this.el.style.visibility = "hidden";
         this.el.style.zIndex = ""+(this.el.style.zIndex-0+1);
     }
     Teleport.prototype = new WebSplat.SpriteChild();
