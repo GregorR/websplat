@@ -1331,6 +1331,10 @@ var WebSplat = new (function() {
         callHandlers("preload", []);
 
         var player;
+
+        var html = document.getElementsByTagName("HTML");
+        if (html.length > 0) html[0].style.overflowX = "hidden";
+        document.body.style.overflowX = "hidden";
     
         initElementPositions(function() {
             player = wpthis.player = new Player();
