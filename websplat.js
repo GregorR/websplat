@@ -693,6 +693,7 @@ var WebSplat = new (function() {
         this.el.wpSprite = this;
         this.el.style.padding = this.el.style.margin = "0px";
 
+        this.drawn = null;
         this.draw(this.state, "r", 0);
 
         this.el.style.color = "black";
@@ -727,20 +728,25 @@ var WebSplat = new (function() {
 
     // (private) draw an image
     Sprite.prototype.draw = function(state, dir, num) {
+        var toDraw = state + num + dir;
+        if (this.drawn === toDraw) return;
+
         var imgSet = this.imageSets[state];
         this.el.width = imgSet.width;
         this.el.height = imgSet.height;
         this.el.style.width = imgSet.width + "px";
         this.el.style.height = imgSet.height + "px";
 
-        var img = this.images[state + num + dir];
+        var img = this.images[toDraw];
         if (!("complete" in img) ||
             (img.complete && img.width > 0 && img.height > 0)) {
             this.el.style.border = "0px";
             var ctx = this.el.getContext("2d");
             ctx.drawImage(img, 0, 0);
+            this.drawn = toDraw;
         } else {
             this.el.style.border = "1px solid red";
+            this.drawn = null;
         }
     }
 
