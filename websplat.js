@@ -843,7 +843,8 @@ var WebSplat = new (function() {
         // acceleration
         var xas = (this.xacc >= 0) ? 1 : -1;
         this.yvel += realyacc;
-        if (this.yvel < wpConf.flyMax) this.yvel = wpConf.flyMax;
+        if (this.yacc !== false && this.yvel < wpConf.flyMax)
+            this.yvel = wpConf.flyMax;
         if (this.xacc === false) {
             // slow down!
             if (this.xvel > 0) {
