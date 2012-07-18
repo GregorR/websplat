@@ -19,7 +19,7 @@
         player.points = 0;
         player.statNames.push("points");
         player.stats.points = "000000";
-        player.statDisplay.points = "<emph>Points:</emph>";
+        player.statDisplay.points = "Points:";
         player.updateStats();
 
         player.getPoints = function(pts) {

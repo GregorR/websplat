@@ -88,9 +88,9 @@
         player.stats["coinsLeft"] = WebSplat.coins;
         player.stats["gameTime"] = 0;
 
-        player.statDisplay["coinsCollected"] = "<emph>Images collected:</emph>";
-        player.statDisplay["coinsLeft"] = "<emph>Images remaining:</emph>";
-        player.statDisplay["gameTime"] = "<emph>Time:</emph>";
+        player.statDisplay["coinsCollected"] = "Images collected:";
+        player.statDisplay["coinsLeft"] = "Images remaining:";
+        player.statDisplay["gameTime"] = "Time:";
 
         player.updateStats();
     });

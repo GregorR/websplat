@@ -93,7 +93,7 @@
             if (st in this.statDisplay) {
                 td.innerHTML = this.statDisplay[st];
             } else {
-                td.innerHTML = "<emph>" + st + ":</emph>";
+                td.innerHTML = st + ":";
             }
             row.appendChild(td);
 
