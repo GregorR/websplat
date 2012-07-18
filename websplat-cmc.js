@@ -59,5 +59,25 @@
         el.style.visibility = "hidden";
         WebSplat.remSprite(cmc);
         player.getPoints(rescuePoints);
+
+        WebSplat.player.hasCMC = true;
+
+        WebSplat.addHandler("ontick", function() {
+            if (!WebSplat.player.hasCMC) return;
+            var player = WebSplat.player;
+            if (player.y < player.h*3) {
+                // rescued 'em!
+                WebSplat.player.hasCMC = false;
+                player.getPoints(rescuePoints);
+
+                var winimg = document.createElement("img");
+                winimg.src = WebSplat.conf.imageBase + "youwin.png";
+                winimg.style.position = "absolute";
+                winimg.style.left = Math.floor(WebSplat.conf.maxX / 2 - 225) + "px";
+                winimg.style.top = "15px";
+                winimg.style.zIndex = ""+(player.el.style.zIndex - 10);
+                document.body.appendChild(winimg);
+            }
+        });
     });
 })();
