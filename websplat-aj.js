@@ -43,7 +43,9 @@
     AppleTree.prototype.isGoody = true;
     AppleTree.prototype.isTree = true;
 
+    var sptick = AppleTree.prototype.tick;
     AppleTree.prototype.tick = function() {
+        sptick.apply(this, arguments);
         this.life--;
         if (this.life <= 0) {
             WebSplat.remSprite(this);
