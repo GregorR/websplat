@@ -131,7 +131,9 @@ var WebSplatPony = "aj";
             head = document.getElementsByTagName("head")[0];
             selector.style.display = "none";
 
-            displayMessage("Loading...");
+            displayMessage("<img src=\"" + imageBase + pony + ".ranimr.gif\" />" +
+                           "Loading..." +
+                           "<img src=\"" + imageBase + pony + ".raniml.gif\" />");
             scriptChain([
                 "http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js",
                 "websplat.js",
