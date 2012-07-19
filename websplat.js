@@ -254,6 +254,7 @@ var WebSplat = new (function() {
             // specific to this element
             var el = els.shift();
             var jqel = $(el);
+            var eltag = el.tagName.toUpperCase();
             var hasText = false;
             var hasChildren = false;
             var isBoring = false;
@@ -283,14 +284,22 @@ var WebSplat = new (function() {
             }
             //});
         
-            // there are certain types which we'll never want to handle, and some which are boring when content-free
-            switch (el.tagName.toUpperCase()) {
+            /* there are certain types which we'll never want to handle, some
+             * which we always want to handle, and some which are boring when
+             * content-free */
+            switch (eltag) {
                 case "BODY":
                 case "SCRIPT":
                 case "NOSCRIPT":
                 case "NOEMBED":
                 case "OPTION":
                     isPlatform = false;
+                    break;
+
+                case "TEXTAREA":
+                case "INPUT":
+                    isPlatform = true;
+                    el.wpSpan = true; // force it to be treated as the innermost
                     break;
 
                 case "TD":
@@ -306,7 +315,16 @@ var WebSplat = new (function() {
             // if it's invisible, don't want it
             if (jqel.css("display") === "none" || jqel.css("visibility") === "hidden")
                 isPlatform = false;
-    
+
+            // more complicated ways for it to be invisible
+            if (!hasText && (eltag === "DIV" || eltag === "SPAN") &&
+                (/(^$|rgba\((\d+, *){3}0\)|transparent)/.test(jqel.css("background-color")) &&
+                 /^(|none)$/.test(jqel.css("background-image")) &&
+                 /^($|0px)/.test(jqel.css("border-width")))) {
+                // likely that this is just alignment BS
+                isPlatform = false;
+            }
+  
             // if it's not a platform, we're done
             if (!isPlatform) {
                 callHandlers("onnonplatform", [el]);
@@ -315,19 +333,19 @@ var WebSplat = new (function() {
 
             var csposition = jqel.css("position");
             var csdisplay = jqel.css("display");
-        
+       
             // OK, definitely a platform, so block it right
             if (!("wpSpan" in el) &&
                 (csposition === "static" || csposition === "relative") &&
                 (csdisplay === "block" || csdisplay === "list-item" ||
                  csdisplay === "table-cell" || csdisplay === "table-caption")) {
-                // change how these are displayed to not be full-width
-                if (csdisplay !== "table-cell" && csdisplay !== "table-caption")
-                    el.style.display = "table";
+                // change how these are displayed 
+                /*if (csdisplay !== "table-cell" && csdisplay !== "table-caption")
+                    el.style.display = "table";*/
 
                 // text align becomes weird
                 var ta = jqel.css("textAlign");
-                if (el.tagName.toUpperCase() == "CENTER") {
+                if (eltag === "CENTER") {
                     el.style.textAlign = "center";
                     ta = "center";
                 }
@@ -344,10 +362,18 @@ var WebSplat = new (function() {
                 if (hasText || hasChildren) {
                     /* need to put everything in spans and make /those/ the
                      * platform for us to stand on the right parts of text */
+
+                    /* but before we do that, make sure we don't eff up its
+                     * width by forcing its specified width to its computed
+                     * width */
+                    el.style.width = jqel.css("width");
+
+                    // now recurse
                     var subels = [];
                     var spanel = document.createElement("span");
                     spanel.wpSpan = true;
                     spanel.style.display = "inline";
+                    spanel.style.width = "auto";
                     while (el.firstChild !== null) {
                         if (el.firstChild.nodeType === 3) { // Node.TEXT_NODE
                             spanel.appendChild(el.removeChild(el.firstChild));
@@ -363,6 +389,7 @@ var WebSplat = new (function() {
                                 spanel = document.createElement("span");
                                 spanel.wpSpan = true;
                                 spanel.style.display = "inline";
+                                spanel.style.width = "auto";
                             }
                         }
                     }
@@ -1352,7 +1379,6 @@ var WebSplat = new (function() {
 
         var html = document.getElementsByTagName("HTML");
         if (html.length > 0) html[0].style.overflowX = "hidden";
-        document.body.style.overflowX = "hidden";
     
         initElementPositions(function() {
             player = wpthis.player = new Player();
