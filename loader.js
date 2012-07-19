@@ -24,8 +24,12 @@ var WebSplatPony = "aj";
     var imageBase = "http://websplat.bitbucket.org/imgs/";
     var head;
 
+    function dce(type) {
+        return document.createElement(type);
+    }
+
     // a "window" for output
-    var wpMsgOut = window.wpMsgOut = document.createElement("div");
+    var wpMsgOut = window.wpMsgOut = dce("div");
     wpMsgOut.style.position = "fixed";
     wpMsgOut.style.left = "0px";
     wpMsgOut.style.top = "0px";
@@ -60,7 +64,7 @@ var WebSplatPony = "aj";
         srcs = srcs.slice(0);
         var src = srcs.shift();
 
-        var script = document.createElement("script");
+        var script = dce("script");
         if (src.match(/\/\//)) {
             script.src = src;
         } else {
@@ -86,7 +90,7 @@ var WebSplatPony = "aj";
     }
 
     // make a frame to offer selections in
-    var selector = document.createElement("div");
+    var selector = dce("div");
     selector.style.backgroundColor = "white";
     selector.style.color = "black";
     selector.style.textAlign = "center";
@@ -94,20 +98,36 @@ var WebSplatPony = "aj";
     selector.style.paddingBottom = "1em";
     displayMessage(selector);
 
-    // a link back to us
-    var link = document.createElement("a");
+    // adverts and such
+    var ad = dce("span");
+    ad.style.fontSize = "0.85em";
+    ad.style.color = "#02a";
+    ad.style.position = "fixed";
+    ad.style.top = "0.5em";
+    ad.style.right = "0.5em";
+    var link = dce("a");
     link.href = "http://websplat.bitbucket.org/";
     link.innerHTML = "Brought to you by WebSplat";
-    link.style.fontSize = "0.85em";
-    link.style.color = "#02a";
-    link.style.position = "fixed";
-    link.style.top = "0.5em";
-    link.style.right = "0.5em";
-    selector.appendChild(link);
+    ad.appendChild(link);
+
+    // addthis if we're not interfering
+    if (!((window._atc||{}).ver)) {
+        ad.appendChild(dce("br"));
+        var addthis = dce("span");
+        addthis.style.float = "right";
+        addthis.innerHTML = '<a class="addthis_button" href="http://www.addthis.com/bookmark.php?v=250&amp;pubid=ra-5006d2d9326df97c"><img src="http://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>';
+        ad.appendChild(addthis);
+        window.addthis_config={"url":"http://websplat.bitbucket.org/","title":"Ponies in your Interwebs"};
+        var scr = dce("script");
+        scr.src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-5006d2d9326df97c";
+        ad.appendChild(scr);
+    }
+
+    selector.appendChild(ad);
 
     // a header to say what's going on
-    var hdr = document.createElement("div");
-    var himg = document.createElement("img");
+    var hdr = dce("div");
+    var himg = dce("img");
     himg.src = imageBase + "choosethyhero.png";
     hdr.appendChild(himg);
     selector.appendChild(hdr);
@@ -117,13 +137,13 @@ var WebSplatPony = "aj";
         var pony = ponyIDs[i];
         var dir = (i >= ponyIDs.length / 2) ? "l" : "r";
 
-        var but = document.createElement("button");
+        var but = dce("button");
         but.style.width = "68px";
         but.style.height = "62px";
         but.style.backgroundColor = "#ffffff";
         but.style.margin = "0px";
         but.style.padding = "0px";
-        var bimg = document.createElement("img");
+        var bimg = dce("img");
         bimg.src = imageBase + pony + ".ranim" + dir + ".gif";
         but.appendChild(bimg);
         but.onclick = (function(pony) { return function() {
