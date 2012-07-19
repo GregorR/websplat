@@ -1377,9 +1377,8 @@ var WebSplat = new (function() {
 
         var player;
 
-        var html = document.getElementsByTagName("HTML");
-        if (html.length > 0) html[0].style.overflowX = "hidden";
-        document.body.style.overflowX = "hidden";
+        // before anything else, make sure the body is static positioned, as it will break things otherwise
+        document.body.style.position = "static";
     
         initElementPositions(function() {
             player = wpthis.player = new Player();
