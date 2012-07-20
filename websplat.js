@@ -269,7 +269,6 @@ var WebSplat = new (function() {
             if (jqel.css("position") === "fixed") continue;
         
             // recurse to sub-elements first
-            //$(el).contents().each(function() { // jQuery is just too slow here :(
             var cns = el.childNodes;
             var cnsl = cns.length;
             for (var i = 0; i < cnsl; i++) {
@@ -282,7 +281,6 @@ var WebSplat = new (function() {
                     els.push(cnode);
                 }
             }
-            //});
         
             /* there are certain types which we'll never want to handle, some
              * which we always want to handle, and some which are boring when
@@ -339,10 +337,6 @@ var WebSplat = new (function() {
                 (csposition === "static" || csposition === "relative") &&
                 (csdisplay === "block" || csdisplay === "list-item" ||
                  csdisplay === "table-cell" || csdisplay === "table-caption")) {
-                // change how these are displayed 
-                /*if (csdisplay !== "table-cell" && csdisplay !== "table-caption")
-                    el.style.display = "table";*/
-
                 // text align becomes weird
                 var ta = jqel.css("textAlign");
                 if (eltag === "CENTER") {
@@ -908,19 +902,30 @@ var WebSplat = new (function() {
         }
   
         this.postAcc();
-    
 
         // then velocity
         // signs we need
         var xs = (this.xvel >= 0) ? 1 : -1;
         var ys = (this.yvel >= 0) ? 1 : -1;
 
+        // get all the elements we may affect
+        var effectBB = [
+            ((xs < 0) ? this.xvel : 0) + this.x,
+            ((xs < 0) ? 0 : this.xvel) + this.x + this.w,
+            ((ys < 0) ? this.yvel : 0) + this.y - wpConf.hopAbove,
+            ((ys < 0) ? 0 : this.yvel) + this.y + this.h + wpConf.crouchThru
+        ];
+        effectBB[1] -= effectBB[0];
+        effectBB[3] -= effectBB[2];
+        var boxEls = wpGetElementsByBox(effectBB[0], effectBB[1], effectBB[2], effectBB[3]);
+
         // x first
         var x = this.x;
         var xe = x + this.xvel;
         this.rightOf = this.leftOf = null;
         for (; x*xs <= xe*xs; x += xs) {
-            var els = wpGetElementsByBoxThru(this, this.thru, false, x, this.w, this.y, this.h-wpConf.hopAbove);
+            boxEls = wpDropThru(this, this.thru, boxEls, true);
+            var els = wpSelectElementsByBox(boxEls, this.w, this.y, this.h-wpConf.hopAbove);
             if (els !== null) {
                 els = this.collision(els, xs, 0);
                 if (els === null) continue;
@@ -942,9 +947,9 @@ var WebSplat = new (function() {
         }
 
         // if we need to hop, do so
-        while (x != this.x &&
+        if (x != this.x &&
             this.collision(
-                wpGetElementsByBoxThru(this, this.thru, false, x, this.w, this.y+this.h-wpConf.hopAbove, wpConf.hopAbove),
+                wpSelectElementsByBox(boxEls, x, this.w, this.y+this.h-wpConf.hopAbove, wpConf.hopAbove),
                 0, ys, true) !== null) {
             this.y--;
         }
@@ -955,13 +960,15 @@ var WebSplat = new (function() {
         var leading = (ys>=0) ? this.h : 0;
         this.above = this.on = null; // default to not being on anything
         for (; y*ys <= ye*ys; y += ys) {
-            var els = wpGetElementsByBoxThru(this, this.thru, false, x, this.w, y+leading, 0);
+            boxEls = wpDropThru(this, this.thru, boxEls, true);
+            var els = wpSelectElementsByBox(boxEls, x, this.w, y+leading, 0);
             if (els !== null) {
                 els = this.collision(els, 0, ys);
                 if (els === null) continue;
 
                 // get more elements to drop through if we duck
-                var morels = wpGetElementsByBoxThru(this, this.thru, false, x, this.w, y + this.crouchThru*ys, this.h);
+                boxEls = wpDropThru(this, this.thru, boxEls, true);
+                var morels = wpSelectElementsByBox(boxEls, x, this.w, y + this.crouchThru*ys, this.h);
                 if (morels != null) els.push.apply(els, morels);
 
                 // then fail
@@ -1287,25 +1294,36 @@ var WebSplat = new (function() {
     }
     this.getElementsByBox = wpGetElementsByBox;
 
+    // remove any elements we're going through
+    function wpDropThru(player, thru, els, doCallHandlers, outthru) {
+        if (els === null) return null;
+        if (typeof doCallHandlers === "undefined") doCallHandlers = true;
+        if (typeof outthru === "undefined") outthru = null;
+
+        for (var i = 0; i < els.length; i++) {
+            var el = els[i];
+            if (outthru !== null) outthru[el.wpID] = true;
+            if (el.wpID in thru) {
+                els.splice(i, 1);
+                i--;
+                if (doCallHandlers) callHandlers("onpassthru", [player, el]);
+            }
+        }
+
+        if (els.length === 0) return null;
+        return els;
+    }
+    this.dropThru = wpDropThru;
+
     // get any element at this location we're not currently falling through
     function wpGetElementsByBoxThru(player, thru, upd, l, w, t, h) {
         var inels = wpGetElementsByBox(l, w, t, h);
-        var outels = [];
+        var outels;
         var outthru = {};
-    
-        if (inels === null) inels = [];
-    
+
         // first get rid of anything we're going through now
-        for (var i = 0; i < inels.length; i++) {
-            var inel = inels[i];
-            outthru[inel.wpID] = true;
-            if (inel.wpID in thru) {
-                callHandlers("onpassthru", [player, inel]);
-            } else {
-                outels.push(inel);
-            }
-        }
-    
+        outels = wpDropThru(player, thru, inels, false, outthru);
+
         // then remove from the thru list anything we've already gone through
         if (upd) {
             for (var tid in thru) {
@@ -1314,11 +1332,44 @@ var WebSplat = new (function() {
                 }
             }
         }
-    
-        if (outels.length == 0) return null;
+
         return outels;
     }
     this.getElementsByBoxThru = wpGetElementsByBoxThru;
+
+    // select a subset of these elements by a (new) bounding box
+    function wpSelectElementsByBox(els, l, w, t, h) {
+        if (els === null) return null;
+        var outels = [];
+        var r = l+w;
+        var b = t+h;
+
+        // go through each element
+        var eln = els.length;
+        for (var eli = 0; eli < eln; eli++) {
+            var el = els[eli];
+            if (!("wpSavedRects" in el)) continue;
+
+            var scrollLeft = el.wpSavedScrollLeft;
+            var scrollTop = el.wpSavedScrollTop;
+            var rects = el.wpSavedRects;
+            var rectl = rects.length;
+            for (var recti = 0; recti < rectl; recti++) {
+                var rect = rects[recti];
+                var ell = rect.left + scrollLeft;
+                var elt = rect.top + scrollTop;
+                var elr = rect.right + scrollLeft;
+                var elb = rect.bottom + scrollTop;
+
+                if (boxIntersection(l, r, t, b, ell, elr, elt, elb))
+                    outels.push(el);
+            }
+        }
+
+        if (outels.length === 0) return null;
+        return outels;
+    }
+    this.selectElementsByBox = wpSelectElementsByBox;
 
     var viewportAsserted = false;
     function assertViewport(left, right, top, bottom) {
