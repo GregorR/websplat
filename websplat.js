@@ -269,7 +269,6 @@ var WebSplat = new (function() {
             if (jqel.css("position") === "fixed") continue;
         
             // recurse to sub-elements first
-            //$(el).contents().each(function() { // jQuery is just too slow here :(
             var cns = el.childNodes;
             var cnsl = cns.length;
             for (var i = 0; i < cnsl; i++) {
@@ -282,7 +281,6 @@ var WebSplat = new (function() {
                     els.push(cnode);
                 }
             }
-            //});
         
             /* there are certain types which we'll never want to handle, some
              * which we always want to handle, and some which are boring when
@@ -339,10 +337,6 @@ var WebSplat = new (function() {
                 (csposition === "static" || csposition === "relative") &&
                 (csdisplay === "block" || csdisplay === "list-item" ||
                  csdisplay === "table-cell" || csdisplay === "table-caption")) {
-                // change how these are displayed 
-                /*if (csdisplay !== "table-cell" && csdisplay !== "table-caption")
-                    el.style.display = "table";*/
-
                 // text align becomes weird
                 var ta = jqel.css("textAlign");
                 if (eltag === "CENTER") {
@@ -373,6 +367,7 @@ var WebSplat = new (function() {
                     var spanel = document.createElement("span");
                     spanel.wpSpan = true;
                     spanel.style.display = "inline";
+                    spanel.style.visibility = "visible";
                     spanel.style.width = "auto";
                     while (el.firstChild !== null) {
                         if (el.firstChild.nodeType === 3) { // Node.TEXT_NODE
@@ -408,11 +403,13 @@ var WebSplat = new (function() {
                     }
 
                 } else {
+                    el.style.visibility = "visible";
                     plats.push(el);
                 }
 
             } else {
                 // add its position to elementPositions
+                el.style.visibility = "visible";
                 plats.push(el);
             }
         }
