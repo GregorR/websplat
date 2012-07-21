@@ -65,7 +65,7 @@
             width: 63,
             height: 34,
             bb: [15, 50, 12, 17]
-        },
+        }
     }
 
     function DiamondDog() {
