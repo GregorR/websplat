@@ -695,24 +695,25 @@ var WebSplat = new (function() {
         // what elements are we clipping through?
         this.thru = {};
 
-        // load all the images
-        if (typeof(this.images) === "undefined") {
-            var images = this.images = {};
-            for (var state in imageSets) {
-                var imgSet = imageSets[state];
-                for (var dir in {"r":0,"l":0}) {
-                    for (var i = 0; i < imgSet.frames; i++) {
-                        if ("frameAliases" in imgSet && imgSet.frameAliases[i] != i) continue;
-                        var img = new Image();
-                        if (imageBase.match(/\/\//)) {
-                            img.src = imageBase + state + i + dir + ".png";
-                        } else {
-                            img.src = wpConf.imageBase + imageBase + state + i + dir + ".png";
-                        }
-                        images[state + i + dir] = img;
-                    }
-                }
-            }
+        // figure out the offsets
+        var states = [];
+        for (var state in imageSets) states.push(state);
+        states.sort();
+        var statel = states.length;
+        var offset = 0;
+        for (var statei = 0; statei < statel; statei++) {
+            var state = states[statei];
+            var imgSet = imageSets[state];
+            imgSet.offset = offset;
+            offset += imgSet.height * 2;
+        }
+
+        // load the image
+        var img = this.image = new Image();
+        if (imageBase.match(/\/\//)) {
+            img.src = imageBase + "png";
+        } else {
+            img.src = wpConf.imageBase + imageBase + "png";
         }
 
         // create the img element that is the actual display of the sprite
@@ -764,12 +765,13 @@ var WebSplat = new (function() {
         this.el.style.width = imgSet.width + "px";
         this.el.style.height = imgSet.height + "px";
 
-        var img = this.images[toDraw];
+        var img = this.image;
         if (!("complete" in img) ||
             (img.complete && img.width > 0 && img.height > 0)) {
             this.el.style.border = "0px";
             var ctx = this.el.getContext("2d");
-            ctx.drawImage(img, 0, 0);
+            ctx.drawImage(img, -imgSet.width*num,
+                -imgSet.offset + ((dir==="l")?-imgSet.height:0));
             this.drawn = toDraw;
         } else {
             this.el.style.border = "1px solid red";
@@ -806,11 +808,6 @@ var WebSplat = new (function() {
         // get the image and frame
         var imgSet = this.imageSets[this.state];
         var frame = Math.floor(this.frame/imgSet.frameRate) % imgSet.frames;
-
-        // frames can be aliased
-        if ("frameAliases" in imgSet) {
-            frame = imgSet.frameAliases[frame];
-        }
 
         // and bounding boxes can be reduced
         var bb = [1, 2, 1, 2];
