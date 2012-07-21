@@ -73,6 +73,7 @@
 
             // then move
             this.setXY(to[0], to[1]);
+            this.startingPosition();
         }
     };
 
