@@ -709,25 +709,25 @@ var WebSplat = new (function() {
         }
 
         // load the image
-        var img = this.image = new Image();
+        var imgsrc;
         if (imageBase.match(/\/\//)) {
-            img.src = imageBase + "png";
+            imgsrc = imageBase + "png";
         } else {
-            img.src = wpConf.imageBase + imageBase + "png";
+            imgsrc = wpConf.imageBase + imageBase + "png";
         }
 
-        // create the img element that is the actual display of the sprite
-        this.el = document.createElement("canvas");
+        // create the span element that is the actual display of the sprite
+        this.el = document.createElement("span");
+        this.el.style.background = "url(" + imgsrc + ")";
         this.el.wpSprite = this;
-        this.el.style.padding = this.el.style.margin = "0px";
 
         this.drawn = null;
         this.draw(this.state, "r", 0);
 
-        this.el.style.color = "black";
+        this.el.style.padding = this.el.style.margin = "0px";
+        this.el.style.overflow = "hidden";
         this.el.style.position = "absolute";
         this.el.style.zIndex = "1000000";
-        this.el.style.fontSize = "20px";
         document.body.appendChild(this.el);
 
         // if it's a sprite platform, we want a faster getClientRects than the builtin one
@@ -760,23 +760,20 @@ var WebSplat = new (function() {
         if (this.drawn === toDraw) return;
 
         var imgSet = this.imageSets[state];
-        this.el.width = imgSet.width;
-        this.el.height = imgSet.height;
         this.el.style.width = imgSet.width + "px";
         this.el.style.height = imgSet.height + "px";
 
-        var img = this.image;
-        if (!("complete" in img) ||
-            (img.complete && img.width > 0 && img.height > 0)) {
-            this.el.style.border = "0px";
-            var ctx = this.el.getContext("2d");
-            ctx.drawImage(img, -imgSet.width*num,
-                -imgSet.offset + ((dir==="l")?-imgSet.height:0));
+        /*if (!("complete" in img) ||
+            (img.complete && img.width > 0 && img.height > 0)) {*/
+            //this.el.style.border = "0px";
+            this.el.style.backgroundPosition =
+                (-imgSet.width*num) + "px " +
+                (-imgSet.offset + ((dir==="l")?-imgSet.height:0)) + "px";
             this.drawn = toDraw;
-        } else {
+        /*} else {
             this.el.style.border = "1px solid red";
             this.drawn = null;
-        }
+        }*/
     }
 
     // usually part of tick, update the image
