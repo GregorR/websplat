@@ -41,15 +41,8 @@
 
     // Buy some apples!
     WebSplat.addHandler("postload", function() {
-        var minY = 240;
-        var maxY = WebSplat.conf.maxY-minY;
-        var ac = Math.ceil((WebSplat.conf.maxX*maxY)/(320*240));
-        for (var i = 0; i < ac; i++) {
-            var b = new Apple();
-            b.setXY(Math.random()*WebSplat.conf.maxX, Math.random()*maxY+minY);
-            b.startingPosition();
-            WebSplat.addSprite(b);
-        }
+        WebSplat.spritesOnPlatform(appleImageSets.s.width, appleImageSets.s.height, 240, 320*240,
+            function() { return new Apple(); });
     });
 
     // collisions with apples

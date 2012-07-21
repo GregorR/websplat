@@ -43,15 +43,8 @@
 
     // Spread some health around
     WebSplat.addHandler("postload", function() {
-        var minY = 240;
-        var maxY = WebSplat.conf.maxY-minY;
-        var ac = Math.ceil((WebSplat.conf.maxX*maxY)/(800*600));
-        for (var i = 0; i < ac; i++) {
-            var b = new Health();
-            b.setXY(Math.random()*WebSplat.conf.maxX, Math.random()*maxY+minY);
-            b.startingPosition();
-            WebSplat.addSprite(b);
-        }
+        WebSplat.spritesOnPlatform(healthImageSets.s.width, healthImageSets.s.height, 240, 800*600,
+            function() { return new Health(); });
     });
 
     // collisions with healths

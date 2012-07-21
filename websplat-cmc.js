@@ -42,9 +42,8 @@
 
         var b = new CMC();
         var minY = Math.floor(WebSplat.conf.maxY * 0.75);
-        var maxY = WebSplat.conf.maxY-minY;
-        b.setXY(Math.floor(Math.random()*WebSplat.conf.maxX),
-                Math.floor(Math.random()*maxY+minY));
+        var xy = WebSplat.randomPlatformPosition(cmcImageSets.s.width, cmcImageSets.s.height, minY);
+        b.setXY(xy.x, xy.y);
         b.startingPosition();
         WebSplat.addSprite(b);
     });

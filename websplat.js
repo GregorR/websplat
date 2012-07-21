@@ -1320,6 +1320,72 @@ var WebSplat = new (function() {
     }
     this.getElementsByBoxThru = wpGetElementsByBoxThru;
 
+    // get a random platform
+    function randomPlatform(minY, tries) {
+        if (typeof minY === "undefined") minY = 0;
+        if (typeof tries === "undefined") tries = 128;
+        for (var i = 0; i < tries; i++) {
+            var ybox = getRandomInt(minY>>wpConf.gridDensity, (wpConf.maxY>>wpConf.gridDensity)+1);
+            if (!(ybox in elementPositions)) continue;
+            var epy = elementPositions[ybox];
+            var xbox = getRandomInt(0, (wpConf.maxX>>wpConf.gridDensity)+1);
+            if (!(xbox in epy)) continue;
+            var els = epy[xbox];
+            if (els.length === 0) continue;
+            var el = els[getRandomInt(0, els.length)];
+            if (minY > 0 &&
+                el.wpSavedRects[0].top + el.wpSavedScrollTop < minY) continue;
+            return el;
+        }
+        return null;
+    }
+    this.randomPlatform = randomPlatform;
+
+    // get a position over a random platform
+    function randomPlatformPosition(w, h, minY, tries) {
+        var platform = randomPlatform(minY, tries);
+        if (platform === null) {
+            // well, we tried!
+            console.log("Fail");
+            return {x: getRandomInt(0, wpConf.maxX), y: getRandomInt(minY, wpConf.maxY)};
+        }
+
+        var scrollLeft = platform.wpSavedScrollLeft;
+        var scrollTop = platform.wpSavedScrollTop;
+        var rects = platform.wpSavedRects;
+        var rectl = rects.length;
+        var topRect = rects[0];
+
+        // find the top one
+        for (var recti = 1; recti < rectl; recti++)
+            if (rects[recti].top < topRect.top) topRect = rects[recti];
+
+        var ell = topRect.left + scrollLeft;
+        var elr = topRect.right + scrollLeft;
+        var elt = topRect.top + scrollTop;
+
+        // now choose our position
+        return {
+            x: getRandomInt(ell, elr - w),
+            y: elt - h - 2
+        };
+    }
+    this.randomPlatformPosition = randomPlatformPosition;
+
+    // autoposition this kind of sprite on platforms
+    function spritesOnPlatform(w, h, minY, frequencyR, cons, tries) {
+        var maxY = wpConf.maxY - minY;
+        var count = Math.ceil((wpConf.maxX*maxY)/frequencyR);
+        for (var i = 0; i < count; i++) {
+            var b = cons();
+            var xy = randomPlatformPosition(w, h, minY, tries);
+            b.setXY(xy.x, xy.y);
+            b.startingPosition();
+            addSprite(b);
+        }
+    }
+    this.spritesOnPlatform = spritesOnPlatform;
+
     var viewportAsserted = false;
     function assertViewport(left, right, top, bottom) {
         // should we scroll?

@@ -173,15 +173,8 @@
 
     // by default, stick some diamond dog in the game
     WebSplat.addHandler("postload", function() {
-        var minY = 240;
-        var maxY = WebSplat.conf.maxY-minY;
         // create some diamond dogs!
-        var sdc = Math.ceil((WebSplat.conf.maxX*maxY)/(640*480));
-        for (var i = 0; i < sdc; i++) {
-            var b = new DiamondDog();
-            b.setXY(Math.random()*WebSplat.conf.maxX, Math.random()*maxY+minY);
-            b.startingPosition();
-            WebSplat.addSprite(b);
-        }
+        WebSplat.spritesOnPlatform(diamondDogImageSets.s.width, diamondDogImageSets.s.height,
+            480, 480*320, function() { return new DiamondDog(); });
     });
 })();
