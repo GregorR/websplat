@@ -89,6 +89,30 @@ var WebSplatPony = "aj";
         }
     }
 
+    // the actual loader function, closing over character for easy onclick
+    function loader(pony) { return function() {
+        WebSplatPony = pony;
+        head = document.getElementsByTagName("head")[0];
+        selector.style.display = "none";
+
+        displayMessage("<img src=\"" + imageBase + pony + ".ranimr.gif\" />" +
+                       "Loading..." +
+                       "<img src=\"" + imageBase + pony + ".raniml.gif\" />");
+        scriptChain([
+            "http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js",
+            "websplat.js",
+            "websplat-stats.js",
+            "websplat-points.js",
+            "websplat-apples.js",
+            "websplat-health.js",
+            "websplat-cmc.js",
+            "websplat-" + pony + ".js",
+            "websplat-baddy.js",
+            "websplat-diamonddog.js",
+            "go.js"
+        ]);
+    }; }
+
     // make a frame to offer selections in
     var selector = dce("div");
     selector.style.backgroundColor = "white";
@@ -146,30 +170,12 @@ var WebSplatPony = "aj";
         var bimg = dce("img");
         bimg.src = imageBase + pony + ".ranim" + dir + ".gif";
         but.appendChild(bimg);
-        but.onclick = (function(pony) { return function() {
-            WebSplatPony = pony;
-            head = document.getElementsByTagName("head")[0];
-            selector.style.display = "none";
-
-            displayMessage("<img src=\"" + imageBase + pony + ".ranimr.gif\" />" +
-                           "Loading..." +
-                           "<img src=\"" + imageBase + pony + ".raniml.gif\" />");
-            scriptChain([
-                "http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js",
-                "websplat.js",
-                "websplat-stats.js",
-                "websplat-points.js",
-                "websplat-apples.js",
-                "websplat-health.js",
-                "websplat-cmc.js",
-                "websplat-" + pony + ".js",
-                "websplat-baddy.js",
-                "websplat-diamonddog.js",
-                "go.js"
-            ]);
-        }; })(pony);
+        but.onclick = loader(pony);
         selector.appendChild(but);
         selector.appendChild(document.createTextNode(" "));
         if (i == 0) but.focus();
     }
+
+    // what's this? EASTER EGGS???
+    himg.onclick = loader("dh");
 })();

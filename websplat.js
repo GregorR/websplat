@@ -1047,10 +1047,6 @@ var WebSplat = new (function() {
     function Player() {
         Sprite.call(this, WebSplatPony + ".", wpConf.playerImageSets, true, false);
 
-        // are we a pegasus?
-        if (WebSplatPony == "rd" || WebSplatPony == "fs")   this.pegasus = true;
-        else                                                this.pegasus = false;
-
         // we're still alive!
         this.dead = false;
         this.deathSpeed = 1;
