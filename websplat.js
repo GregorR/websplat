@@ -717,6 +717,11 @@ var WebSplat = new (function() {
 
         // create the img element that is the actual display of the sprite
         this.el = document.createElement("canvas");
+        this.useCanvas = true;
+        if (!("getContext" in this.el)) {
+            this.el = document.createElement("img");
+            this.useCanvas = false;
+        }
         this.el.wpSprite = this;
         this.el.style.padding = this.el.style.margin = "0px";
 
@@ -768,8 +773,12 @@ var WebSplat = new (function() {
         if (!("complete" in img) ||
             (img.complete && img.width > 0 && img.height > 0)) {
             this.el.style.border = "0px";
-            var ctx = this.el.getContext("2d");
-            ctx.drawImage(img, 0, 0);
+            if (this.useCanvas) {
+                var ctx = this.el.getContext("2d");
+                ctx.drawImage(img, 0, 0);
+            } else {
+                this.el.src = img.src;
+            }
             this.drawn = toDraw;
         } else {
             this.el.style.border = "1px solid red";
