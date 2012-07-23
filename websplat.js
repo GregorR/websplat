@@ -241,6 +241,7 @@ var WebSplat = new (function() {
     // initialize platform elements
     function initElementPlatforms(plats, els, then) {
         var stTime = new Date().getTime();
+        var whitespace = /^[ \r\n\t\u00A0]*$/;
 
         while (els.length) {
             if (new Date().getTime() - stTime >= 100) {
@@ -274,7 +275,7 @@ var WebSplat = new (function() {
             for (var i = 0; i < cnsl; i++) {
                 var cnode = cns[i];
                 if (cnode.nodeType === 3) { // Node.TEXT_NODE
-                    if (!/^[ \r\n\t\u00A0]*$/i.test(cnode.data)) // if it's just whitespace, ignore it
+                    if (!whitespace.test(cnode.data)) // if it's just whitespace, ignore it
                         hasText = true;
                 } else if (cnode.nodeType === 1) { // Node.ELEMENT_NODE
                     hasChildren = true;
@@ -333,10 +334,7 @@ var WebSplat = new (function() {
             var csdisplay = jqel.css("display");
        
             // OK, definitely a platform, so block it right
-            if (!("wpSpan" in el) &&
-                (csposition === "static" || csposition === "relative") &&
-                (csdisplay === "block" || csdisplay === "list-item" ||
-                 csdisplay === "table-cell" || csdisplay === "table-caption")) {
+            if (!("wpSpan" in el)) {
                 // text align becomes weird
                 var ta = jqel.css("textAlign");
                 if (eltag === "CENTER") {
@@ -364,36 +362,40 @@ var WebSplat = new (function() {
 
                     // now recurse
                     var subels = [];
-                    var spanel = document.createElement("span");
-                    spanel.wpSpan = true;
-                    spanel.style.display = "inline";
-                    spanel.style.visibility = "visible";
-                    spanel.style.width = "auto";
+                    var spanel;
                     while (el.firstChild !== null) {
                         if (el.firstChild.nodeType === 3) { // Node.TEXT_NODE
-                            spanel.appendChild(el.removeChild(el.firstChild));
-                        } else {
-                            if (el.firstChild.nodeType === 1 && // Node.ELEMENT_NODE
-                                $(el.firstChild).css("display") === "inline") {
-                                // we can just keep this in the span
-                                spanel.appendChild(el.removeChild(el.firstChild));
-                            } else {
-                                // need to switch to a new span
-                                subels.push(spanel);
-                                subels.push(el.removeChild(el.firstChild));
-                                spanel = document.createElement("span");
-                                spanel.wpSpan = true;
-                                spanel.style.display = "inline";
-                                spanel.style.width = "auto";
+                            var chi, chl = el.firstChild.data.length;
+                            // make a span per character
+                            for (chi = 0; chi < chl; chi++) {
+                                var ch = el.firstChild.data[chi];
+                                var chn = document.createTextNode(ch);
+                                if (whitespace.test(ch)) {
+                                    subels.push(chn);
+
+                                } else {
+                                    var spanel = document.createElement("span");
+                                    spanel.wpSpan = true;
+                                    spanel.style.display = "inline";
+                                    spanel.style.visibility = "visible";
+                                    spanel.style.width = "auto";
+                                    spanel.appendChild(chn);
+                                    subels.push(spanel);
+
+                                }
                             }
+
+                            el.removeChild(el.firstChild);
+
+                        } else {
+                            subels.push(el.removeChild(el.firstChild));
+
                         }
                     }
-                    subels.push(spanel);
 
                     // then put those spans in this
-                    for (var i = 0; i < subels.length; i++) {
+                    for (var i = 0; i < subels.length; i++)
                         el.appendChild(subels[i]);
-                    }
 
                     // and handle them instead
                     for (var i = 0; i < subels.length; i++) {
