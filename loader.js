@@ -21,7 +21,7 @@ var WebSplatPony = "aj";
     window.WebSplat = {};
 
     var ponyIDs = ["ts", "rd", "aj", "pp", "r", "fs"];
-    var imageBase = "http://websplat.bitbucket.org/imgs/";
+    var imageBase = "http://localhost:8080/imgs/";
     var head;
 
     function dce(type) {
@@ -68,7 +68,7 @@ var WebSplatPony = "aj";
         if (src.match(/\/\//)) {
             script.src = src;
         } else {
-            script.src = "http://websplat.bitbucket.org/websplat/" + src;
+            script.src = "http://localhost:8080/" + src;
         }
         head.appendChild(script);
 
@@ -101,12 +101,8 @@ var WebSplatPony = "aj";
         scriptChain([
             "http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js",
             "websplat.js",
-            "websplat-stats.js",
-            "websplat-points.js",
             "websplat-apples.js",
             "websplat-health.js",
-            "websplat-cmc.js",
-            "websplat-" + pony + ".js",
             "websplat-baddy.js",
             "websplat-diamonddog.js",
             "go.js"

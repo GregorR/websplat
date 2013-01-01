@@ -42,102 +42,7 @@ var WebSplat = new (function() {
         // time to be invincible for
         invTime: 1000,
 
-        imageBase: "http://websplat.bitbucket.org/imgs/",
-
-        playerImageSets: {
-            s: { // still
-                frames: 1,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            },
-            c: { // crouching
-                frames: 1,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            },
-            r: { // running
-                frames: 6,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            },
-            rs: { // sliding
-                frames: 1,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            },
-            rt: { // turning
-                frames: 1,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            },
-            ja: { // jumping (1)
-                frames: 1,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            },
-            jb: { // jumping (2)
-                frames: 1,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            },
-            jc: { // jumping (3)
-                frames: 1,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            },
-            z: { // zapped
-                frames: 2,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            },
-            da: { // dying (a)
-                frames: 1,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            },
-            db: { // dying (b)
-                frames: 1,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            },
-            dc: { // dying (c)
-                frames: 1,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            },
-            dd: { // dead
-                frames: 1,
-                frameRate: 3,
-                width: 68,
-                height: 62,
-                bb: [30, 46, 24, 36]
-            }
-        },
-
+        imageBase: "http://localhost:8080/imgs/",
 
         // auto-filled
         maxX: 0,
@@ -191,7 +96,8 @@ var WebSplat = new (function() {
         setTimeout(func, 0);
     }
     
-    // the hash of all element positions bucketed by player size * 4
+    // the hash of all element positions in buckets
+    var elementBucketSz = 32;
     var elementPositions = {};
     
     // initialize element positions
@@ -308,7 +214,6 @@ var WebSplat = new (function() {
             }
         
             // if we don't have text and do have children, we don't want this node to be a platform or obstacle
-            //player.debug.innerHTML += el.tagName + " " + hasText + " " + hasChildren + " \\ ";
             if (!hasText && (hasChildren || isBoring)) isPlatform = false;
         
             // if it's invisible, don't want it
@@ -873,7 +778,7 @@ var WebSplat = new (function() {
 
     // perform a tick of this sprite
     Sprite.prototype.tick = function() {
-        if (!this.onScreen() && !this.isPlayer) return;
+        if (!this.onScreen()) return;
 
         this.updateImage();
 
@@ -1041,195 +946,6 @@ var WebSplat = new (function() {
     }
 
 
-    // the player (sprite)
-    Sprite.prototype.isPlayer = false;
-    function Player() {
-        Sprite.call(this, WebSplatPony + ".", wpConf.playerImageSets, true, false);
-
-        // we're still alive!
-        this.dead = false;
-        this.deathSpeed = 1;
-        this.hp = 6;
-        this.maxHP = 6;
-        this.invincible = false;
-        this.invTimer = null;
-    
-        // what jump are we on?
-        this.jump = 0;
-    
-        // are we power-jumping?
-        this.powerJump = false;
-
-        // players are players!
-        this.isPlayer = true;
-    }
-    Player.prototype = new SpriteChild();
-    this.Player = Player;
-
-    // when we change the XY of a player, need to assert the viewport follows them
-    Player.prototype.setXY = function(x, y) {
-        Sprite.prototype.setXY.call(this, x, y);
-        assertViewport(this.x, this.x+this.w, this.y, this.y+this.h);
-    }
-
-    Player.prototype.updateImagePrime = function() {
-        // choose our state
-        if (this.dead) {
-            if (this.frame < this.deathSpeed) return;
-
-            // da -> db -> dc -> dd
-            if (this.state == "da") {
-                this.state = "db";
-                this.frame = 0;
-            } else if (this.state == "db") {
-                this.state = "dc";
-                this.frame = 0;
-            } else if (this.state == "dc") {
-                this.state = "dd";
-                this.frame = 0;
-            } else if (this.state != "dd") {
-                this.state = "da";
-                this.frame = 0;
-            }
-        } else if (this.on === null ||
-                   (this.mode == "fly" && this.yacc !== false)) {
-            if (this.mode == "fly") {
-                // flying, weeeh (but nothing to do here)
-                this.state = "f";
-
-            } else if (this.mode == "jfc") {
-                // crouching step of the fallthrough, crouch for 10 frames
-                if (this.frame >= 10) {
-                    this.mode = "jf";
-                    this.frame = 0;
-                }
-                this.state = "c";
-
-            } else {
-                this.mode = "jf";
-
-                if (Math.abs(this.yvel) < 3) {
-                    // middle frame
-                    this.state = "jb";
-                } else if (this.yvel < 0) {
-                    this.state = "ja";
-                } else {
-                    this.state = "jc";
-                }
-            }
-        } else if (this.xacc != 0 || this.xvel != 0) {
-            if ((this.xacc >= 0 && this.xvel < 0) ||
-                (this.xacc <= 0 && this.xvel > 0)) {
-                if (this.xacc == 0) {
-                    // stopping, slide
-                    this.mode = "rs";
-                    this.state = "rs";
-                } else {
-                    this.mode = "rt";
-                    this.state = "rt";
-                }
-            } else {
-                this.mode = "r";
-                this.state = "r";
-            }
-        } else {
-            this.mode = "s";
-            this.state = "s";
-        }
-    }
-
-    Player.prototype.postAcc = function() {
-        // if we're falling, we shouldn't be powerjumping
-        if (this.yvel > 0) this.powerJump = false;
-
-        // and when a player dies, he stops x-moving
-        if (this.dead) this.xacc = false;
-    }
-
-    Player.prototype.collision = function(els, xs, ys) {
-        if (els === null) return els;
-        var rels = [];
-        for (var i = 0; i < els.length; i++) {
-            var el = els[i];
-            if (callHandlers("oncollide", [this, el, (ys<0)?this.powerJump:false, xs, ys])) {
-                rels.push(el);
-            }
-        }
-        if (rels.length == 0) return null;
-        els = rels;
-
-        // now see if we're going to powerjump through them
-        if (ys < 0 && this.powerJump) {
-            for (var i = 0; i < els.length; i++) {
-                this.thru[els[i].wpID] = true;
-            }
-            return null;
-        }
-
-        // if we got here, we're stuck
-        if (ys > 0) {
-            this.jump = 0;
-            this.powerJump = false;
-        }
-
-        return els;
-    }
-
-    Player.prototype.hitBottom = function() {
-        // if a player hits the bottom of the playing area, they die
-        this.dead = true;
-    }
-
-    Player.prototype.takeDamage = function(from, pts) {
-        if (this.dead) return false;
-
-        this.zap = wpConf.zapTime;
-
-        if (!this.invincible) {
-            this.hp -= pts;
-            if (this.hp <= 0) {
-                // you killed him! :(
-                this.hp = 0;
-                this.dead = true;
-                this.onChangeHP();
-                return true;
-            }
-            this.onChangeHP();
-
-            // become temporarily invincible
-            this.invincible = true;
-            if (this.invTimer !== null) {
-                clearTimeout(this.invTimer);
-            }
-            var plthis = this;
-            this.invTimer = setTimeout(function() {
-                plthis.invincible = false;
-                plthis.invTimer = null;
-            }, wpConf.invTime);
-
-            // and go flying
-            if (from.x < this.x) {
-                this.forcexvel = wpConf.moveSpeed; // FIXME, should be a different configurable
-            } else {
-                this.forcexvel = -wpConf.moveSpeed;
-            }
-            this.forceyvel = -wpConf.moveSpeed;
-        }
-
-        return false;
-    }
-
-    Player.prototype.getHP = function(pts) {
-        this.hp += pts;
-        if (this.hp > this.maxHP) this.hp = this.maxHP;
-    }
-
-    Player.prototype.doDamage = function(to, pts) {}
-    Player.prototype.onChangeHP = function() {}
-    Player.prototype.specialOn = function() {}
-    Player.prototype.specialOff = function() {}
-
-
     // do these two boxes intersect?
     function boxIntersection(l1, r1, t1, b1, l2, r2, t2, b2) {
         var xInt = r1 >= l2 && l1 <= r2;
@@ -1292,7 +1008,7 @@ var WebSplat = new (function() {
     this.getElementsByBox = wpGetElementsByBox;
 
     // get any element at this location we're not currently falling through
-    function wpGetElementsByBoxThru(player, thru, upd, l, w, t, h) {
+    function wpGetElementsByBoxThru(sprite, thru, upd, l, w, t, h) {
         var inels = wpGetElementsByBox(l, w, t, h);
         var outels = [];
         var outthru = {};
@@ -1304,7 +1020,7 @@ var WebSplat = new (function() {
             var inel = inels[i];
             outthru[inel.wpID] = true;
             if (inel.wpID in thru) {
-                callHandlers("onpassthru", [player, inel]);
+                callHandlers("onpassthru", [sprite, inel]);
             } else {
                 outels.push(inel);
             }
@@ -1436,24 +1152,22 @@ var WebSplat = new (function() {
     }
 
     // and if they try to scroll themselves, take it back!
+    /*
     $(window).scroll(function() {
         if (viewportAsserted && "Player" in wpthis)
             assertViewport(wpthis.player.x, wpthis.player.x+wpthis.player.w,
                            wpthis.player.y, wpthis.player.y+wpthis.player.h);
     });
+    */
 
     function go() {
         callHandlers("preload", []);
-
-        var player;
 
         // before anything else, make sure the body is static positioned, as it will break things otherwise
         document.body.style.position = "static";
     
         initElementPositions(function() {
-            player = wpthis.player = new Player();
-            addSprite(player);
-
+            /*
             var keydown = function(ev) {
                 if (ev.ctrlKey || ev.altKey || ev.metaKey) return true;
                 if (player.dead) return true;
@@ -1564,9 +1278,10 @@ var WebSplat = new (function() {
             // put the player in the starting position
             player.setXY(Math.floor($(window).width()/2), player.h*2);
             player.startingPosition();
+            */
 
             // finish loading
-            callHandlers("postload", [player]);
+            callHandlers("postload", []);
             wpDisplayMessage();
 
             // and go
