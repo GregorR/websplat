@@ -101,8 +101,6 @@ var WebSplatPony = "aj";
         scriptChain([
             "http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js",
             "websplat.js",
-            "websplat-apples.js",
-            "websplat-health.js",
             "websplat-baddy.js",
             "websplat-diamonddog.js",
             "go.js"

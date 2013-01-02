@@ -68,12 +68,12 @@ var WebSplat = new (function() {
     }
     this.addHandler = addHandler;
 
-    function callHandlers(type, args) {
+    function callHandlers(type) {
         var harr = wpHandlers[type];
         var ret = true;
         for (var i = 0; i < harr.length; i++) {
             var func = harr[i];
-            var fret = func.apply(this, args);
+            var fret = func.apply(this, arguments);
             if (typeof(fret) !== "undefined") {
                 ret = ret && fret;
             }
@@ -132,7 +132,7 @@ var WebSplat = new (function() {
                 if (!("wpIsPlatform" in el)) {
                     el.wpIsPlatform = true;
                     addElementPosition(el);
-                    callHandlers("onplatform", [el]);
+                    callHandlers("onplatform", el);
                 }
             }
             if (i == plats.length) {
@@ -169,7 +169,7 @@ var WebSplat = new (function() {
     
             if ("wpIgnore" in el) continue;
     
-            callHandlers("onelement", [el]);
+            callHandlers("onelement", el);
 
             /* if it's position:fixed, we don't want it at all (can't platform
              * on something that moves with the scrollbar) */
@@ -231,7 +231,7 @@ var WebSplat = new (function() {
   
             // if it's not a platform, we're done
             if (!isPlatform) {
-                callHandlers("onnonplatform", [el]);
+                callHandlers("onnonplatform", el);
                 continue;
             }
 
@@ -489,7 +489,7 @@ var WebSplat = new (function() {
                 while (new Date().getTime() < nextTime) {}
             }
 
-            callHandlers("ontick", [this]);
+            callHandlers("ontick", this);
 
             if (sprites.length == 0) {
                 // time to stop!
@@ -532,14 +532,14 @@ var WebSplat = new (function() {
 
         $(window).focus(function() {
             if (gameTimer === null) {
-                callHandlers("onresume", []);
+                callHandlers("onresume");
                 gameTimer = setTimeout(spritesTick, wpConf.msPerTick);
             }
         });
 
         $(window).blur(function() {
             if (gameTimer !== null) {
-                callHandlers("onpause", []);
+                callHandlers("onpause");
                 clearTimeout(gameTimer);
                 gameTimer = refTime = null;
             }
@@ -1020,7 +1020,7 @@ var WebSplat = new (function() {
             var inel = inels[i];
             outthru[inel.wpID] = true;
             if (inel.wpID in thru) {
-                callHandlers("onpassthru", [sprite, inel]);
+                callHandlers("onpassthru", sprite, inel);
             } else {
                 outels.push(inel);
             }
@@ -1161,107 +1161,13 @@ var WebSplat = new (function() {
     */
 
     function go() {
-        callHandlers("preload", []);
+        callHandlers("preload");
 
         // before anything else, make sure the body is static positioned, as it will break things otherwise
         document.body.style.position = "static";
     
         initElementPositions(function() {
             /*
-            var keydown = function(ev) {
-                if (ev.ctrlKey || ev.altKey || ev.metaKey) return true;
-                if (player.dead) return true;
-                switch (ev.which) {
-                    case 37: // left
-                    case 65: // a
-                        player.xacc = -1;
-                        player.xaccmax = wpConf.moveSpeed * -1;
-                        break;
-            
-                    case 39: // right
-                    case 68: // d
-                        player.xacc = 1;
-                        player.xaccmax = wpConf.moveSpeed;
-                        break;
-            
-                    case 38: // up
-                    case 87: // w
-                        if ("pressingUp" in player) break;
-                        player.pressingUp = true;
-                        if (player.on !== null) {
-                            player.jump++;
-                            player.on = null;
-                            player.yvel = -wpConf.jumpSpeed;
-                        } else if (player.jump <= 1) {
-                            player.jump = 2;
-                            player.powerJump = true;
-                            player.yvel = -wpConf.jumpSpeed;
-                        }
-                        break;
-            
-                    case 40: // down
-                    case 83: // s
-                        if (player.on !== null) {
-                            player.mode = "jfc";
-                            player.frame = 0;
-                            for (var i = 0; i < player.on.length; i++) {
-                                player.thru[player.on[i].wpID] = true;
-                            }
-                            player.on = null;
-                        }
-                        break;
-
-                    case 70: // f
-                    case 32: // space
-                        player.specialOn();
-                        break;
-                }
-            
-                ev.stopPropagation();
-                return false;
-            }
-            $(document.body).keydown(keydown);
-            $(window).keydown(keydown);
-            
-            var keyup = function(ev) {
-                switch (ev.which) {
-                    case 37: // left
-                    case 65: // a
-                        if (player.xacc < 0) {
-                            player.xacc = false;
-                            player.xaccmax = false;
-                        }
-                        break;
-            
-                    case 39: // right
-                    case 68: // d
-                        if (player.xacc > 0) {
-                            player.xacc = false;
-                            player.xaccmax = false;
-                        }
-                        break;
-            
-                    case 38: // up
-                    case 87: // w
-                        delete player.pressingUp;
-                        break;
-            
-                    case 40: // down
-                    case 83: // s
-                        break;
-
-                    case 70: // f
-                    case 32: // space
-                        player.specialOff();
-                        break;
-                }
-            
-                ev.stopPropagation();
-                return false;
-            }
-            $(document.body).keyup(keyup);
-            $(window).keyup(keyup);
-
             // prevent resizing (it's cheating!)
             var origW = $(window).width();
             var origH = $(window).height();
@@ -1281,7 +1187,7 @@ var WebSplat = new (function() {
             */
 
             // finish loading
-            callHandlers("postload", []);
+            callHandlers("postload");
             wpDisplayMessage();
 
             // and go

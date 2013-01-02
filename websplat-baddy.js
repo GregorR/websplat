@@ -18,7 +18,7 @@
     WebSplat.Sprite.prototype.isBaddy = false;
 
     // collisions with baddies
-    WebSplat.addHandler("oncollide", function(player, el, pj, xs, ys) {
+    WebSplat.addHandler("oncollide", function(ev, player, el, pj, xs, ys) {
         if (!("wpSprite" in el)) return;
         var sprite = el.wpSprite;
         if (!sprite.isBaddy) return;
