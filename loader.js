@@ -14,14 +14,10 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-var WebSplatPony = "aj";
-
 (function() {
     if ("WebSplat" in window) return;
     window.WebSplat = {};
 
-    var ponyIDs = ["ts", "rd", "aj", "pp", "r", "fs"];
-    var imageBase = "http://localhost:8080/imgs/";
     var head;
 
     function dce(type) {
@@ -89,20 +85,19 @@ var WebSplatPony = "aj";
         }
     }
 
-    // the actual loader function, closing over character for easy onclick
-    function loader(pony) { return function() {
-        WebSplatPony = pony;
+    // the actual loader function
+    function loader() { return function() {
         head = document.getElementsByTagName("head")[0];
         selector.style.display = "none";
 
-        displayMessage("<img src=\"" + imageBase + pony + ".ranimr.gif\" />" +
-                       "Loading..." +
-                       "<img src=\"" + imageBase + pony + ".raniml.gif\" />");
+        displayMessage("Loading...");
+
         scriptChain([
             "http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js",
             "websplat.js",
             "websplat-baddy.js",
             "websplat-diamonddog.js",
+            "websplat-goody.js",
             "go.js"
         ]);
     }; }
@@ -143,15 +138,8 @@ var WebSplatPony = "aj";
 
     selector.appendChild(ad);
 
-    // a header to say what's going on
-    var hdr = dce("div");
-    var himg = dce("img");
-    himg.src = imageBase + "choosethyhero.png";
-    hdr.appendChild(himg);
-    selector.appendChild(hdr);
-
     // then offer the selections!
-    for (var i = 0; i < ponyIDs.length; i++) {
+    /*for (var i = 0; i < ponyIDs.length; i++) {
         var pony = ponyIDs[i];
         var dir = (i >= ponyIDs.length / 2) ? "l" : "r";
 
@@ -168,8 +156,9 @@ var WebSplatPony = "aj";
         selector.appendChild(but);
         selector.appendChild(document.createTextNode(" "));
         if (i == 0) but.focus();
-    }
-
-    // what's this? EASTER EGGS???
-    himg.onclick = loader("dh");
+    }*/
+    var but = dce("button");
+    but.innerHTML = "Play";
+    but.onclick = loader();
+    selector.appendChild(but);
 })();
