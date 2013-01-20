@@ -25,10 +25,11 @@
                 var els = WebSplat.getElementsGridPosition(x, y);
                 if (els === null) continue;
                 for (var i = 0; i < els.length; i++) {
-                    var dist = WebSplat.elDistance(els[i], bazX, bazY);
-                    console.log(dist);
-                    if (dist < bazRad) {
-                        els[i].style.color = "red";
+                    var el = els[i];
+                    if ("wpSprite" in el) continue;
+                    if (WebSplat.elInDistance(el, bazRad, bazX, bazY)) {
+                        WebSplat.remElementPosition(el);
+                        el.style.visibility = "hidden";
                     }
                 }
             }

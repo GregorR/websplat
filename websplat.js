@@ -444,15 +444,11 @@ var WebSplat = new (function() {
     }
     this.getElementsGridPosition = getElementsGridPosition;
 
-    // what is the distance (min) of this element from this point?
-    function elDistance(el, fromX, fromY, max) {
-        if (typeof min === "undefined") max = Infinity;
-
+    // is el within max of fromX, fromY?
+    function elInDistance(el, max, fromX, fromY) {
         var scrollTop = el.wpSavedScrollTop;
         var scrollLeft = el.wpSavedScrollLeft;
         var rects = el.wpSavedRects;
-
-        var dist = Infinity;
 
         for (var ri = 0; ri < rects.length; ri++) {
             var rect = rects[ri];
@@ -487,16 +483,16 @@ var WebSplat = new (function() {
             dy = fromY - cy;
             if (dy < 0) dy = -dy;
 
-            if (dx > dist || dy > dist ||
-                dx > max || dy > max) continue;
+            if (dx > max || dy > max) continue;
+            if (dx + dy <= max) return true;
 
             var rdist = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-            if (rdist < dist) dist = rdist;
+            if (rdist <= max) return true;
         }
 
-        return dist;
+        return false;
     }
-    this.elDistance = elDistance;
+    this.elInDistance = elInDistance;
 
     // the sprite list
     var sprites = this.sprites = [];
