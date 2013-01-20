@@ -42,7 +42,7 @@ var WebSplat = new (function() {
         // time to be invincible for
         invTime: 1000,
 
-        imageBase: "http://localhost:8080/imgs/",
+        imageBase: "http://websplat.bitbucket.org/imgs/",
 
         // auto-filled
         maxX: 0,
