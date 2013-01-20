@@ -97,7 +97,6 @@ var WebSplat = new (function() {
     }
     
     // the hash of all element positions in buckets
-    var elementBucketSz = 32;
     var elementPositions = {};
     
     // initialize element positions
@@ -434,6 +433,70 @@ var WebSplat = new (function() {
         addElementPosition(el);
     }
     this.movElementPosition = movElementPosition;
+
+    // get elements by grid position
+    function getElementsGridPosition(x, y) {
+        var ely = elementPositions[y];
+        if (typeof ely === "undefined") return null;
+        var els = ely[x];
+        if (typeof els === "undefined") return null;
+        return els;
+    }
+    this.getElementsGridPosition = getElementsGridPosition;
+
+    // what is the distance (min) of this element from this point?
+    function elDistance(el, fromX, fromY, max) {
+        if (typeof min === "undefined") max = Infinity;
+
+        var scrollTop = el.wpSavedScrollTop;
+        var scrollLeft = el.wpSavedScrollLeft;
+        var rects = el.wpSavedRects;
+
+        var dist = Infinity;
+
+        for (var ri = 0; ri < rects.length; ri++) {
+            var rect = rects[ri];
+            var ell = rect.left + scrollLeft;
+            var elr = rect.right + scrollLeft;
+            var elt = rect.top + scrollTop;
+            var elb = rect.bottom + scrollTop;
+            var cx, cy, dx, dy;
+
+            if (ell < fromX) {
+                if (elr < fromX) {
+                    cx = elr;
+                } else {
+                    cx = fromX;
+                }
+            } else {
+                cx = ell;
+            }
+
+            if (elt < fromY) {
+                if (elb < fromY) {
+                    cy = elb;
+                } else {
+                    cy = fromY;
+                }
+            } else {
+                cy = elt;
+            }
+
+            dx = fromX - cx;
+            if (dx < 0) dx = -dx;
+            dy = fromY - cy;
+            if (dy < 0) dy = -dy;
+
+            if (dx > dist || dy > dist ||
+                dx > max || dy > max) continue;
+
+            var rdist = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+            if (rdist < dist) dist = rdist;
+        }
+
+        return dist;
+    }
+    this.elDistance = elDistance;
 
     // the sprite list
     var sprites = this.sprites = [];

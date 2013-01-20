@@ -98,6 +98,7 @@
             "websplat-baddy.js",
             "websplat-diamonddog.js",
             "websplat-goody.js",
+            "websplat-bazooka.js",
             "go.js"
         ]);
     }; }
@@ -161,4 +162,5 @@
     but.innerHTML = "Play";
     but.onclick = loader();
     selector.appendChild(but);
+    but.focus();
 })();
