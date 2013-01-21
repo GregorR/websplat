@@ -16,7 +16,10 @@
 
 (function() {
     var bazRad = 100;
+    var bazPower = 50;
     var gd = WebSplat.conf.gridDensity;
+
+    var bazPowerMult = bazPower/bazRad;
 
     $(window).click(function(ev) {
         ev.preventDefault();
@@ -49,9 +52,10 @@
                         var dy = sprite.y - bazY;
                         var dist = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
                         if (dist < bazRad) {
-                            var angle = Math.atan((sprite.y - bazY) / (sprite.x - bazX));
-                            sprite.xvel = Math.cos(angle) * (bazRad - dist) * ((dx>0)?1:-1);
-                            sprite.yvel = Math.sin(angle) * (bazRad - dist) * ((dy>0)?1:-1);
+                            var angle = Math.atan2(Math.abs(dy), Math.abs(dx));
+                            console.log(Math.cos(angle));
+                            sprite.xvel = Math.cos(angle) * (bazRad - dist) * bazPowerMult * ((dx>0)?1:-1);
+                            sprite.forceyvel = Math.sin(angle) * (bazRad - dist) * bazPowerMult * ((dy>0)?1:-1);
                         }
                     } else if (WebSplat.elInDistance(el, bazRad, bazX, bazY)) {
                         WebSplat.remElementPosition(el);
