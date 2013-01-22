@@ -16,7 +16,7 @@
 
 (function() {
     var diamondDogConf = {
-        dogs: ["dda.", "ddb.", "ddc."],
+        dogs: ["pp2."],
         moveSpeed: 3,
         pointsPerKill: 500,
         edgeDetectDist: 5,
@@ -24,47 +24,12 @@
     }
 
     var diamondDogImageSets = {
-        s: {
-            frames: 3,
-            frameRate: 3,
-            width: 63,
-            height: 34,
-            bb: [15, 50, 12, 17]
-        },
         r: {
-            frames: 6,
+            frames: 16,
             frameRate: 3,
-            width: 63,
-            height: 34,
-            bb: [15, 50, 12, 17]
-        },
-        da: {
-            frames: 1,
-            frameRate: 3,
-            width: 63,
-            height: 34,
-            bb: [15, 50, 12, 17]
-        },
-        db: {
-            frames: 1,
-            frameRate: 3,
-            width: 63,
-            height: 34,
-            bb: [15, 50, 12, 17]
-        },
-        dc: {
-            frames: 1,
-            frameRate: 3,
-            width: 63,
-            height: 34,
-            bb: [15, 50, 12, 17]
-        },
-        dd: {
-            frames: 1,
-            frameRate: 3,
-            width: 63,
-            height: 34,
-            bb: [15, 50, 12, 17]
+            width: 62,
+            height: 62,
+            bb: [26, 45, 35, 39]
         }
     }
 
@@ -174,7 +139,7 @@
     // by default, stick some diamond dog in the game
     WebSplat.addHandler("postload", function() {
         // create some diamond dogs!
-        WebSplat.spritesOnPlatform(diamondDogImageSets.s.width, diamondDogImageSets.s.height,
+        WebSplat.spritesOnPlatform(diamondDogImageSets.r.width, diamondDogImageSets.r.height,
             480, 480*320, function() { return new DiamondDog(); });
     });
 })();
