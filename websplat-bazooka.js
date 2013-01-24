@@ -110,6 +110,23 @@
     }
 
     var mdStart = null;
+    var firing = null;
+
+    // firing is delayed by player animation
+    WebSplat.addHandler("ontick", function() {
+        if (firing !== null) {
+            var player = firing.player;
+            if (player.frame >= 16) {
+                var rocket = new Rocket(player);
+                rocket.setXY(player.x, player.y);
+                rocket.startingPosition();
+                rocket.xvel = firing.xvel;
+                rocket.yvel = firing.yvel;
+                WebSplat.addSprite(rocket);
+                firing = null;
+            }
+        }
+    });
 
     $(window).mousedown(function(ev) {
         mdStart = new Date().getTime();
@@ -138,12 +155,17 @@
         var xvel = Math.cos(angle) * bazSpeed * bazTime;
         var yvel = Math.sin(angle) * bazSpeed * bazTime;
 
-        var rocket = new Rocket(player);
-        rocket.setXY(player.x + xvel, player.y + yvel);
-        rocket.startingPosition();
-        rocket.xvel = xvel;
-        rocket.yvel = yvel;
-        WebSplat.addSprite(rocket);
+        if (player instanceof WebSplat.Pony) {
+            player.state = "c";
+            player.frame = 0;
+            if (xvel < 0) {
+                player.dir = "l";
+            } else {
+                player.dir = "r";
+            }
+        }
+
+        firing = {xvel: xvel, yvel: yvel, player: player};
 
         return false;
     });

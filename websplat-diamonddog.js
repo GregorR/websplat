@@ -49,8 +49,16 @@
         this.xacc = 0;
         this.updateImage();
     }
+    WebSplat.Pony = DiamondDog;
     DiamondDog.prototype = new WebSplat.SpriteChild();
     DiamondDog.prototype.isBaddy = true;
+
+    DiamondDog.prototype.updateImagePrime = function() {
+        if (this.state === "c" && this.frame >= diamondDogImageSets.c.frames) {
+            this.state = "r";
+            this.frame = 0;
+        }
+    }
 
     // don't collide with goodies
     DiamondDog.prototype.collision = function(els, xs, ys) {
