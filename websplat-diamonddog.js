@@ -114,6 +114,12 @@
         return false;
     }
 
+    // if we hit the bottom, go back to the top
+    DiamondDog.prototype.hitBottom = function() {
+        console.log("Bottom, moving to " + this.h*2);
+        this.setXY(this.x, this.h*2);
+    }
+
     // take damage
     DiamondDog.prototype.takeDamage = function(from, pts) {
         // make it dead

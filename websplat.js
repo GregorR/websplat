@@ -109,15 +109,7 @@ var WebSplat = new (function() {
                 wpConf.maxX = maxX;
                 wpConf.maxY = maxY;
 
-                // make a platform for the bottom
-                var bspan = document.createElement("span");
-                bspan.style.position = "absolute";
-                bspan.style.left = "0px";
-                bspan.style.top = (maxY + 100) + "px";
-                bspan.style.width = maxX + "px";
-                bspan.style.height = "10px";
-                document.body.appendChild(bspan);
-                addElementPositions([bspan], then);
+                then();
             });
         });
     }
@@ -971,10 +963,14 @@ var WebSplat = new (function() {
             x = maxX - this.w;
         }
         if (y < -240) y = -240;
-        if (y + this.h > maxY + 100) {
+        if (y + this.h > wpConf.maxY + 100) {
             if (this.on === null) this.on = [];
-            y = maxY - this.h + 100;
+            y = wpConf.maxY - this.h + 100;
+            this.x = x;
+            this.y = y;
             this.hitBottom();
+            x = this.x;
+            y = this.y;
         }
 
         // now set the location
