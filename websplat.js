@@ -637,6 +637,7 @@ var WebSplat = new (function() {
         this.xvel = 0;
         this.xacc = false; // false means "stop"
         this.xaccmax = false; // the maximum velocity we can get to by acceleration
+        this.slowxacc = 1; // slowdown due to "friction"
         this.yvel = 0;
         this.yacc = false; // less meaningful here
 
@@ -715,6 +716,7 @@ var WebSplat = new (function() {
         }
 
         this.setXY(0, 0);
+        this.updateImage();
     }
     this.Sprite = Sprite;
     function SpriteChild() {}
@@ -844,7 +846,7 @@ var WebSplat = new (function() {
         // get the acceleration from our platform
         var realxacc = this.xacc;
         if (this.xacc === false) realxacc = 0;
-        var slowxacc = 1;
+        var slowxacc = this.slowxacc;
         if (this.on === null) {
             realxacc *= wpConf.jumpAcc;
             slowxacc *= wpConf.jumpSlowAcc;
@@ -1210,14 +1212,17 @@ var WebSplat = new (function() {
         }
     }
 
+    function assertPlayerViewport() {
+        assertViewport(wpthis.player.x, wpthis.player.x+wpthis.player.w,
+                       wpthis.player.y, wpthis.player.y+wpthis.player.h);
+    }
+    this.assertPlayerViewport = assertPlayerViewport;
+
     // and if they try to scroll themselves, take it back!
-    /*
     $(window).scroll(function() {
-        if (viewportAsserted && "Player" in wpthis)
-            assertViewport(wpthis.player.x, wpthis.player.x+wpthis.player.w,
-                           wpthis.player.y, wpthis.player.y+wpthis.player.h);
+        if (viewportAsserted && "player" in wpthis && wpthis.player !== null)
+            assertPlayerViewport();
     });
-    */
 
     function go() {
         callHandlers("preload");

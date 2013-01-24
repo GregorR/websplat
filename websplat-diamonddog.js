@@ -82,6 +82,7 @@
 
         // do a normal round
         WebSplat.Sprite.prototype.tick.call(this);
+        if (WebSplat.player === this) return;
 
         // only do anything if we're on a platform
         if (!this.munching && this.on !== null) {
@@ -138,8 +139,11 @@
 
     // by default, stick some diamond dog in the game
     WebSplat.addHandler("postload", function() {
+        var last = null;
         // create some diamond dogs!
         WebSplat.spritesOnPlatform(diamondDogImageSets.r.width, diamondDogImageSets.r.height,
-            480, 480*320, function() { return new DiamondDog(); });
+            480, 480*320, function() { return (last = new DiamondDog()); });
+        WebSplat.player = last;
+        WebSplat.assertPlayerViewport();
     });
 })();

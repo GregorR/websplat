@@ -28,13 +28,13 @@
                 case 37: // left
                 case 65: // a
                     player.xacc = -1;
-                    player.xaccmax = wpConf.moveSpeed * -1;
+                    player.xaccmax = WebSplat.conf.moveSpeed * -1;
                     break;
         
                 case 39: // right
                 case 68: // d
                     player.xacc = 1;
-                    player.xaccmax = wpConf.moveSpeed;
+                    player.xaccmax = WebSplat.conf.moveSpeed;
                     break;
         
                 case 38: // up
@@ -44,11 +44,11 @@
                     if (player.on !== null) {
                         player.jump++;
                         player.on = null;
-                        player.yvel = -wpConf.jumpSpeed;
+                        player.yvel = -WebSplat.conf.jumpSpeed;
                     } else if (player.jump <= 1) {
                         player.jump = 2;
                         player.powerJump = true;
-                        player.yvel = -wpConf.jumpSpeed;
+                        player.yvel = -WebSplat.conf.jumpSpeed;
                     }
                     break;
         

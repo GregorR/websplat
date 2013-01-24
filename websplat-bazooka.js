@@ -17,17 +17,58 @@
 (function() {
     var bazRad = 100;
     var bazPower = 50;
+    var bazSpd = 30;
     var gd = WebSplat.conf.gridDensity;
 
     var bazPowerMult = bazPower/bazRad;
 
-    $(window).click(function(ev) {
-        ev.preventDefault();
-        ev.stopPropagation();
+    var rocketLauncherImageSets = {
+        r: {
+            frames: 1,
+            frameRate: 3,
+            width: 62,
+            height: 62,
+            bb: [26, 45, 35, 39]
+        }
+    };
+
+    function Rocket(firedBy) {
+        this.mode = this.state = "r";
+        this.expended = false;
+        this.firedBy = firedBy;
+        WebSplat.Sprite.call(this, "pp2.", rocketLauncherImageSets, true, false);
+        this.slowxacc = 0;
+    }
+    Rocket.prototype = new WebSplat.SpriteChild();
+
+    // FIXME: why is this necessary?
+    Rocket.prototype.tick = function() {
+        this.thru[this.firedBy.el.wpID] = true;
+        WebSplat.Sprite.prototype.tick.call(this);
+    }
+
+    Rocket.prototype.collision = function(els, xs, ys) {
+        var bazX = this.x;
+        var bazY = this.y;
+
+        // only for REAL collisions, thank you
+        if (els === null) return els;
+
+        // only blow up once
+        if (this.expended) return els;
+        this.expended = true;
+
+        for (var i = 0; i < els.length; i++) {
+            if (els[i].wpSprite === WebSplat.player)
+                console.log("DAMMIT");
+        }
+
+        // destroy the rocket
+        WebSplat.deplatformSprite(this);
+        WebSplat.remSprite(this);
+        this.el.parentNode.removeChild(this.el);
 
         // find all the platforms in this region and destroy them
-        var bazX = ev.pageX;
-        var bazY = ev.pageY;
         var minX = bazX - bazRad;
         var maxX = bazX + bazRad;
         var minY = bazY - bazRad;
@@ -53,7 +94,6 @@
                         var dist = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
                         if (dist < bazRad) {
                             var angle = Math.atan2(Math.abs(dy), Math.abs(dx));
-                            console.log(Math.cos(angle));
                             sprite.xvel = Math.cos(angle) * (bazRad - dist) * bazPowerMult * ((dx>0)?1:-1);
                             sprite.forceyvel = Math.sin(angle) * (bazRad - dist) * bazPowerMult * ((dy>0)?1:-1);
                         }
@@ -64,6 +104,28 @@
                 }
             }
         }
+
+        return els;
+    }
+
+    $(window).click(function(ev) {
+        if (WebSplat.player === null) return true;
+        var player = WebSplat.player;
+
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        // figure out the angle that the rocket should be fired at
+        var angle = Math.atan2(ev.pageY - player.y, ev.pageX - player.x);
+        var xvel = Math.cos(angle) * bazSpd;
+        var yvel = Math.sin(angle) * bazSpd;
+
+        var rocket = new Rocket(player);
+        rocket.setXY(player.x + xvel, player.y + yvel);
+        rocket.startingPosition();
+        rocket.xvel = xvel;
+        rocket.yvel = yvel;
+        WebSplat.addSprite(rocket);
 
         return false;
     });
