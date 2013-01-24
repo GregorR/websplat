@@ -17,7 +17,8 @@
 (function() {
     var bazRad = 100;
     var bazPower = 50;
-    var bazSpd = 30;
+    var bazPowerupTime = 2000;
+    var bazSpeed = 30;
     var gd = WebSplat.conf.gridDensity;
 
     var bazPowerMult = bazPower/bazRad;
@@ -108,17 +109,34 @@
         return els;
     }
 
-    $(window).click(function(ev) {
+    var mdStart = null;
+
+    $(window).mousedown(function(ev) {
+        mdStart = new Date().getTime();
+        ev.preventDefault();
+        ev.stopPropagation();
+    });
+
+    $(window).mouseup(function(ev) {
         if (WebSplat.player === null) return true;
         var player = WebSplat.player;
+
+        if (mdStart === null) return true;
+
+        // how long have we been holding it down?
+        var bazTime = new Date().getTime() - mdStart;
+        mdStart = null;
+        bazTime /= bazPowerupTime;
+        if (bazTime > 1.0) bazTime = 1.0;
+        bazTime = bazTime * 0.75 + 0.25;
 
         ev.preventDefault();
         ev.stopPropagation();
 
         // figure out the angle that the rocket should be fired at
         var angle = Math.atan2(ev.pageY - player.y, ev.pageX - player.x);
-        var xvel = Math.cos(angle) * bazSpd;
-        var yvel = Math.sin(angle) * bazSpd;
+        var xvel = Math.cos(angle) * bazSpeed * bazTime;
+        var yvel = Math.sin(angle) * bazSpeed * bazTime;
 
         var rocket = new Rocket(player);
         rocket.setXY(player.x + xvel, player.y + yvel);
@@ -127,6 +145,12 @@
         rocket.yvel = yvel;
         WebSplat.addSprite(rocket);
 
+        return false;
+    });
+
+    $(window).click(function(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
         return false;
     });
 })();

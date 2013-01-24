@@ -563,6 +563,10 @@ var WebSplat = new (function() {
                     sprites[i].tick();
                 }
 
+                if (wpthis.player) {
+                    assertPlayerViewport();
+                }
+
             }
 
             var cur = new Date().getTime();
