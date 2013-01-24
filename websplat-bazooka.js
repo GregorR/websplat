@@ -27,9 +27,9 @@
         r: {
             frames: 1,
             frameRate: 3,
-            width: 62,
-            height: 62,
-            bb: [26, 45, 35, 39]
+            width: 53,
+            height: 53,
+            bb: [23, 39, 31, 35]
         }
     };
 

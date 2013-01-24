@@ -27,9 +27,16 @@
         r: {
             frames: 16,
             frameRate: 3,
-            width: 62,
-            height: 62,
-            bb: [26, 45, 35, 39]
+            width: 53,
+            height: 53,
+            bb: [23, 39, 31, 35]
+        },
+        c: {
+            frames: 32,
+            frameRate: 3,
+            width: 82,
+            height: 58,
+            bb: [36, 68, 37, 40], // make this fit with r
         }
     }
 
