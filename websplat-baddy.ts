@@ -14,11 +14,13 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-(function() {
-    WebSplat.Sprite.prototype.isBaddy = false;
+///<reference path="websplat.ts" />
+
+module WebSplat {
+    Sprite.prototype.isBaddy = false;
 
     // collisions with baddies
-    WebSplat.addHandler("oncollide", function(ev, player, el, pj, xs, ys) {
+    addHandler("oncollide", function(ev, player, el, pj, xs, ys) {
         if (!("wpSprite" in el)) return;
         var sprite = el.wpSprite;
         if (!sprite.isBaddy) return;
@@ -48,4 +50,4 @@
             player.thru[sprite.el.wpID] = true;
         }
     });
-})();
+}

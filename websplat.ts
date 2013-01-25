@@ -14,11 +14,14 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-var WebSplat = new (function() {
-    var wpthis = this;
+// from loader.js
+declare function wpDisplayMessage(): void;
+
+module WebSplat {
+    export var player: any = null;
 
     // configuration:
-    var wpConf = this.conf = {
+    export var conf = {
         // what level should we divide up the grid (as a power of 2)?
         gridDensity: 6,
 
@@ -42,7 +45,7 @@ var WebSplat = new (function() {
         // time to be invincible for
         invTime: 1000,
 
-        imageBase: "http://websplat.bitbucket.org/imgs/",
+        imageBase: "http://localhost:8080/imgs/",
 
         // auto-filled
         maxX: 0,
@@ -50,7 +53,7 @@ var WebSplat = new (function() {
     };
 
     // handlers:
-    var wpHandlers = this.handlers = {
+    export var handlers = {
         "preload": [],
         "postload": [],
         "onelement": [],
@@ -63,13 +66,12 @@ var WebSplat = new (function() {
         "onresume": []
     };
 
-    function addHandler(type, func) {
-        wpHandlers[type].push(func);
+    export function addHandler(type, func) {
+        handlers[type].push(func);
     }
-    this.addHandler = addHandler;
 
-    function callHandlers(type) {
-        var harr = wpHandlers[type];
+    function callHandlers(type, ...eflags: any[]) {
+        var harr = handlers[type];
         var ret = true;
         for (var i = 0; i < harr.length; i++) {
             var func = harr[i];
@@ -81,10 +83,9 @@ var WebSplat = new (function() {
         return ret;
     }
 
-    function getRandomInt(min, max) {
+    export function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
     }
-    this.getRandomInt = getRandomInt;
 
     // globals
     var maxX = 0;
@@ -106,8 +107,8 @@ var WebSplat = new (function() {
             // then add all the elements
             addElementPositions(plats, function() {
                 if (maxX < $(window).width()-20) maxX = $(window).width()-20;
-                wpConf.maxX = maxX;
-                wpConf.maxY = maxY;
+                conf.maxX = maxX;
+                conf.maxY = maxY;
 
                 then();
             });
@@ -316,7 +317,7 @@ var WebSplat = new (function() {
     }
     
     // add an element at a position
-    function addElementPosition(el) {
+    export function addElementPosition(el) {
         el.wpID = curWPID++;
 
         var scrollTop = document.documentElement.scrollTop ||
@@ -343,31 +344,32 @@ var WebSplat = new (function() {
             if (elb > maxY) maxY = elb;
 
             // adjust the info
-            ell = Math.floor(ell>>wpConf.gridDensity);
-            elt = Math.floor(elt>>wpConf.gridDensity);
-            elr = Math.ceil(elr>>wpConf.gridDensity);
-            elb = Math.ceil(elb>>wpConf.gridDensity);
+            ell = Math.floor(ell>>conf.gridDensity);
+            elt = Math.floor(elt>>conf.gridDensity);
+            elr = Math.ceil(elr>>conf.gridDensity);
+            elb = Math.ceil(elb>>conf.gridDensity);
         
             // put it in the hash
             for (var y = elt; y <= elb; y++) {
-                if (!(y in elementPositions)) {
-                    elementPositions[y] = {};
+                var sy = String(y);
+                if (!(sy in elementPositions)) {
+                    elementPositions[sy] = {};
                 }
-                var epy = elementPositions[y];
+                var epy = elementPositions[sy];
         
                 for (var x = ell; x <= elr; x++) {
-                    if (!(x in epy)) {
-                        epy[x] = [];
+                    var sx = String(x);
+                    if (!(sx in epy)) {
+                        epy[sx] = [];
                     }
-                    epy[x].push(el);
+                    epy[sx].push(el);
                 }
             }
         }
     }
-    this.addElementPosition = addElementPosition;
 
     // remove this paltform
-    function remElementPosition(el) {
+    export function remElementPosition(el) {
         if (!("wpSavedRects" in el)) return;
 
         var scrollTop = el.wpSavedScrollTop;
@@ -387,26 +389,28 @@ var WebSplat = new (function() {
             if (elb > maxY) maxY = elb;
 
             // adjust the info
-            ell = Math.floor(ell>>wpConf.gridDensity);
-            elt = Math.floor(elt>>wpConf.gridDensity);
-            elr = Math.ceil(elr>>wpConf.gridDensity);
-            elb = Math.ceil(elb>>wpConf.gridDensity);
+            ell = Math.floor(ell>>conf.gridDensity);
+            elt = Math.floor(elt>>conf.gridDensity);
+            elr = Math.ceil(elr>>conf.gridDensity);
+            elb = Math.ceil(elb>>conf.gridDensity);
         
             // take it from the hash
             for (var y = elt; y <= elb; y++) {
-                if (!(y in elementPositions)) continue;
-                var epy = elementPositions[y];
+                var sy = String(y);
+                if (!(sy in elementPositions)) continue;
+                var epy = elementPositions[sy];
         
                 for (var x = ell; x <= elr; x++) {
-                    if (!(x in epy)) continue;
-                    var els = epy[x];
+                    var sx = String(x);
+                    if (!(sx in epy)) continue;
+                    var els = epy[sx];
                     var outels = [];
 
                     for (var i = 0; i < els.length; i++) {
                         if (els[i] !== el) outels.push(els[i]);
                     }
 
-                    epy[x] = outels;
+                    epy[sx] = outels;
                 }
             }
         }
@@ -417,27 +421,24 @@ var WebSplat = new (function() {
             delete el.wpSavedRects;
         } catch (ex) {}
     }
-    this.remElementPosition = remElementPosition;
 
     // move this element to its new location
-    function movElementPosition(el) {
+    export function movElementPosition(el) {
         remElementPosition(el);
         addElementPosition(el);
     }
-    this.movElementPosition = movElementPosition;
 
     // get elements by grid position
-    function getElementsGridPosition(x, y) {
+    export function getElementsGridPosition(x, y) {
         var ely = elementPositions[y];
         if (typeof ely === "undefined") return null;
         var els = ely[x];
         if (typeof els === "undefined") return null;
         return els;
     }
-    this.getElementsGridPosition = getElementsGridPosition;
 
     // is el within max of fromX, fromY?
-    function elInDistance(el, max, fromX, fromY) {
+    export function elInDistance(el, max, fromX, fromY) {
         var scrollTop = el.wpSavedScrollTop;
         var scrollLeft = el.wpSavedScrollLeft;
         var rects = el.wpSavedRects;
@@ -484,28 +485,25 @@ var WebSplat = new (function() {
 
         return false;
     }
-    this.elInDistance = elInDistance;
 
     // the sprite list
-    var sprites = this.sprites = [];
+    export var sprites = [];
 
     // add a sprite to the sprite list
-    function addSprite(sprite) {
+    export function addSprite(sprite) {
         sprites.push(sprite);
     }
-    this.addSprite = addSprite;
 
     // deplatform a sprite
-    function deplatformSprite(sprite) {
+    export function deplatformSprite(sprite) {
         if (sprite.isPlatform) {
             remElementPosition(sprite.el);
             sprite.isPlatform = false;
         }
     }
-    this.deplatformSprite = deplatformSprite;
 
     // remove a sprite from the sprite list
-    function remSprite(sprite) {
+    export function remSprite(sprite) {
         // if it's a platform, remove that first
         deplatformSprite(sprite);
 
@@ -514,9 +512,8 @@ var WebSplat = new (function() {
         for (var i = 0; i < sprites.length; i++) {
             if (sprites[i] !== sprite) osprites.push(sprites[i]);
         }
-        sprites = this.sprites = osprites;
+        sprites = osprites;
     }
-    this.remSprite = remSprite;
 
     // the main timer
     var gameTimer = null;
@@ -555,14 +552,14 @@ var WebSplat = new (function() {
                     sprites[i].tick();
                 }
 
-                if (wpthis.player) {
+                if (player) {
                     assertPlayerViewport();
                 }
 
             }
 
             var cur = new Date().getTime();
-            var next = nextTime = refTime + tickNo*wpConf.msPerTick;
+            var next = nextTime = refTime + tickNo*conf.msPerTick;
             var ms = next - cur;
 
             if (ms < 0) {
@@ -583,12 +580,12 @@ var WebSplat = new (function() {
 
     // start the sprite timer
     function spritesGo() {
-        gameTimer = setTimeout(spritesTick, wpConf.msPerTick);
+        gameTimer = setTimeout(spritesTick, conf.msPerTick);
 
         $(window).focus(function() {
             if (gameTimer === null) {
                 callHandlers("onresume");
-                gameTimer = setTimeout(spritesTick, wpConf.msPerTick);
+                gameTimer = setTimeout(spritesTick, conf.msPerTick);
             }
         });
 
@@ -602,7 +599,7 @@ var WebSplat = new (function() {
     }
 
     // the Sprite "class", which represents an object with accelerative movement and displayed as an image
-    function Sprite(imageBase, imageSets, hasGravity, isPlatform) {
+    export function Sprite(imageBase, imageSets, hasGravity, isPlatform) {
         this.imageBase = imageBase;
         this.imageSets = imageSets;
         this.hasGravity = hasGravity;
@@ -667,7 +664,7 @@ var WebSplat = new (function() {
                         if (imageBase.match(/\/\//)) {
                             img.src = imageBase + state + i + dir + ".png";
                         } else {
-                            img.src = wpConf.imageBase + imageBase + state + i + dir + ".png";
+                            img.src = conf.imageBase + imageBase + state + i + dir + ".png";
                         }
                         images[state + i + dir] = img;
                     }
@@ -714,9 +711,7 @@ var WebSplat = new (function() {
         this.setXY(0, 0);
         this.updateImage();
     }
-    this.Sprite = Sprite;
-    function SpriteChild() {}
-    this.SpriteChild = SpriteChild;
+    export function SpriteChild() {}
     SpriteChild.prototype = Sprite.prototype;
 
     // (private) draw an image
@@ -844,13 +839,13 @@ var WebSplat = new (function() {
         if (this.xacc === false) realxacc = 0;
         var slowxacc = this.slowxacc;
         if (this.on === null) {
-            realxacc *= wpConf.jumpAcc;
-            slowxacc *= wpConf.jumpSlowAcc;
+            realxacc *= conf.jumpAcc;
+            slowxacc *= conf.jumpSlowAcc;
         } else {
-            realxacc *= wpConf.runAcc;
-            slowxacc *= wpConf.runSlowAcc;
+            realxacc *= conf.runAcc;
+            slowxacc *= conf.runSlowAcc;
         }
-        var appgravity = this.hasGravity ? ("ownGravity" in this) ? this.ownGravity : wpConf.gravity : 0;
+        var appgravity = this.hasGravity ? ("ownGravity" in this) ? this.ownGravity : conf.gravity : 0;
         var gravs = (appgravity >= 0) ? 1 : -1;
         var realyacc = appgravity;
         if (this.yacc !== false) realyacc += this.yacc;
@@ -859,8 +854,8 @@ var WebSplat = new (function() {
         // acceleration
         var xas = (this.xacc >= 0) ? 1 : -1;
         this.yvel += realyacc;
-        if (this.yacc !== false && this.yvel < wpConf.flyMax)
-            this.yvel = wpConf.flyMax;
+        if (this.yacc !== false && this.yvel < conf.flyMax)
+            this.yvel = conf.flyMax;
         if (this.xacc === false) {
             // slow down!
             if (this.xvel > 0) {
@@ -890,7 +885,7 @@ var WebSplat = new (function() {
         var xe = x + this.xvel;
         this.rightOf = this.leftOf = null;
         for (; x*xs <= xe*xs; x += xs) {
-            var els = wpGetElementsByBoxThru(this, this.thru, false, x, this.w, this.y, this.h-wpConf.hopAbove);
+            var els = getElementsByBoxThru(this, this.thru, false, x, this.w, this.y, this.h-conf.hopAbove);
             if (els !== null) {
                 els = this.collision(els, xs, 0);
                 if (els === null) continue;
@@ -914,7 +909,7 @@ var WebSplat = new (function() {
         // if we need to hop, do so
         while (x != this.x &&
             this.collision(
-                wpGetElementsByBoxThru(this, this.thru, false, x, this.w, this.y+this.h-wpConf.hopAbove, wpConf.hopAbove),
+                getElementsByBoxThru(this, this.thru, false, x, this.w, this.y+this.h-conf.hopAbove, conf.hopAbove),
                 0, ys, true) !== null) {
             this.y--;
         }
@@ -925,13 +920,13 @@ var WebSplat = new (function() {
         var leading = (ys>=0) ? this.h : 0;
         this.above = this.on = null; // default to not being on anything
         for (; y*ys <= ye*ys; y += ys) {
-            var els = wpGetElementsByBoxThru(this, this.thru, false, x, this.w, y+leading, 0);
+            var els = getElementsByBoxThru(this, this.thru, false, x, this.w, y+leading, 0);
             if (els !== null) {
                 els = this.collision(els, 0, ys);
                 if (els === null) continue;
 
                 // get more elements to drop through if we duck
-                var morels = wpGetElementsByBoxThru(this, this.thru, false, x, this.w, y + this.crouchThru*ys, this.h);
+                var morels = getElementsByBoxThru(this, this.thru, false, x, this.w, y + this.crouchThru*ys, this.h);
                 if (morels != null) els.push.apply(els, morels);
 
                 // then fail
@@ -951,7 +946,7 @@ var WebSplat = new (function() {
         }
 
         // get our thrulist correct by getting around our location
-        wpGetElementsByBoxThru(this, this.thru, true, x-1, this.w+2, y-1, this.h+2);
+        getElementsByBoxThru(this, this.thru, true, x-1, this.w+2, y-1, this.h+2);
 
         // bounds
         if (x < 0) {
@@ -963,9 +958,9 @@ var WebSplat = new (function() {
             x = maxX - this.w;
         }
         if (y < -240) y = -240;
-        if (y + this.h > wpConf.maxY + 100) {
+        if (y + this.h > conf.maxY + 100) {
             if (this.on === null) this.on = [];
-            y = wpConf.maxY - this.h + 100;
+            y = conf.maxY - this.h + 100;
             this.x = x;
             this.y = y;
             this.hitBottom();
@@ -987,7 +982,7 @@ var WebSplat = new (function() {
     // make this a starting position by figuring out what we're clipping through
     Sprite.prototype.startingPosition = function() {
         var thru = {};
-        var gothru = wpGetElementsByBox(this.x, this.w, this.y, this.h);
+        var gothru = getElementsByBox(this.x, this.w, this.y, this.h);
         if (gothru !== null) {
             for (var i = 0; i < gothru.length; i++) {
                 thru[gothru[i].wpID] = true;
@@ -1015,14 +1010,14 @@ var WebSplat = new (function() {
     }
 
     // get any element at this location
-    function wpGetElementsByBox(l, w, t, h) {
+    export function getElementsByBox(l, w, t, h) {
         // get the bins
-        var ls = Math.floor(l>>wpConf.gridDensity);
+        var ls = Math.floor(l>>conf.gridDensity);
         var r = l+w;
-        var rs = Math.floor(r>>wpConf.gridDensity);
-        var ts = Math.floor(t>>wpConf.gridDensity);
+        var rs = Math.floor(r>>conf.gridDensity);
+        var ts = Math.floor(t>>conf.gridDensity);
         var b = t+h;
-        var bs = Math.floor(b>>wpConf.gridDensity);
+        var bs = Math.floor(b>>conf.gridDensity);
     
         var els = [];
         var checked = {};
@@ -1039,8 +1034,9 @@ var WebSplat = new (function() {
                 // now check for an actual overlap
                 for (var eli = 0; eli < elbox.length; eli++) {
                     var el = elbox[eli];
-                    if (el.wpID in checked) continue;
-                    checked[el.wpID] = true;
+                    var elIS = String(el.wpID);
+                    if (elIS in checked) continue;
+                    checked[elIS] = true;
                     if (typeof(el.wpAllowClip) !== "undefined") continue;
 
                     // check each rect
@@ -1066,11 +1062,10 @@ var WebSplat = new (function() {
         if (els.length == 0) return null;
         return els;
     }
-    this.getElementsByBox = wpGetElementsByBox;
 
     // get any element at this location we're not currently falling through
-    function wpGetElementsByBoxThru(sprite, thru, upd, l, w, t, h) {
-        var inels = wpGetElementsByBox(l, w, t, h);
+    export function getElementsByBoxThru(sprite, thru, upd, l, w, t, h) {
+        var inels = getElementsByBox(l, w, t, h);
         var outels = [];
         var outthru = {};
     
@@ -1080,7 +1075,7 @@ var WebSplat = new (function() {
         for (var i = 0; i < inels.length; i++) {
             var inel = inels[i];
             outthru[inel.wpID] = true;
-            if (inel.wpID in thru) {
+            if (String(inel.wpID) in thru) {
                 callHandlers("onpassthru", sprite, inel);
             } else {
                 outels.push(inel);
@@ -1099,17 +1094,16 @@ var WebSplat = new (function() {
         if (outels.length == 0) return null;
         return outels;
     }
-    this.getElementsByBoxThru = wpGetElementsByBoxThru;
 
     // get a random platform
-    function randomPlatform(minY, tries) {
+    export function randomPlatform(minY, tries) {
         if (typeof minY === "undefined") minY = 0;
         if (typeof tries === "undefined") tries = 128;
         for (var i = 0; i < tries; i++) {
-            var ybox = getRandomInt(minY>>wpConf.gridDensity, (wpConf.maxY>>wpConf.gridDensity)+1);
+            var ybox = String(getRandomInt(minY>>conf.gridDensity, (conf.maxY>>conf.gridDensity)+1));
             if (!(ybox in elementPositions)) continue;
             var epy = elementPositions[ybox];
-            var xbox = getRandomInt(0, (wpConf.maxX>>wpConf.gridDensity)+1);
+            var xbox = String(getRandomInt(0, (conf.maxX>>conf.gridDensity)+1));
             if (!(xbox in epy)) continue;
             var els = epy[xbox];
             if (els.length === 0) continue;
@@ -1120,15 +1114,14 @@ var WebSplat = new (function() {
         }
         return null;
     }
-    this.randomPlatform = randomPlatform;
 
     // get a position over a random platform
-    function randomPlatformPosition(w, h, minY, tries) {
+    export function randomPlatformPosition(w, h, minY, tries) {
         var platform = randomPlatform(minY, tries);
         if (platform === null) {
             // well, we tried!
             console.log("Fail");
-            return {x: getRandomInt(0, wpConf.maxX), y: getRandomInt(minY, wpConf.maxY)};
+            return {x: getRandomInt(0, conf.maxX), y: getRandomInt(minY, conf.maxY)};
         }
 
         var scrollLeft = platform.wpSavedScrollLeft;
@@ -1151,12 +1144,11 @@ var WebSplat = new (function() {
             y: elt - h - 2
         };
     }
-    this.randomPlatformPosition = randomPlatformPosition;
 
     // autoposition this kind of sprite on platforms
-    function spritesOnPlatform(w, h, minY, frequencyR, cons, tries) {
-        var maxY = wpConf.maxY - minY;
-        var count = Math.ceil((wpConf.maxX*maxY)/frequencyR);
+    export function spritesOnPlatform(w, h, minY, frequencyR, cons, tries?) {
+        var maxY = conf.maxY - minY;
+        var count = Math.ceil((conf.maxX*maxY)/frequencyR);
         for (var i = 0; i < count; i++) {
             var b = cons();
             var xy = randomPlatformPosition(w, h, minY, tries);
@@ -1165,7 +1157,6 @@ var WebSplat = new (function() {
             addSprite(b);
         }
     }
-    this.spritesOnPlatform = spritesOnPlatform;
 
     var viewportAsserted = false;
     function assertViewport(left, right, top, bottom) {
@@ -1212,19 +1203,18 @@ var WebSplat = new (function() {
         }
     }
 
-    function assertPlayerViewport() {
-        assertViewport(wpthis.player.x, wpthis.player.x+wpthis.player.w,
-                       wpthis.player.y, wpthis.player.y+wpthis.player.h);
+    export function assertPlayerViewport() {
+        assertViewport(player.x, player.x+player.w,
+                       player.y, player.y+player.h);
     }
-    this.assertPlayerViewport = assertPlayerViewport;
 
     // and if they try to scroll themselves, take it back!
     $(window).scroll(function() {
-        if (viewportAsserted && "player" in wpthis && wpthis.player !== null)
+        if (viewportAsserted && player !== null)
             assertPlayerViewport();
     });
 
-    function go() {
+    export function go() {
         callHandlers("preload");
 
         // before anything else, make sure the body is static positioned, as it will break things otherwise
@@ -1257,6 +1247,5 @@ var WebSplat = new (function() {
             // and go
             spritesGo();
         });
-    };
-    this.go = go;
-})();
+    }
+}

@@ -14,27 +14,26 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-(function() {
-    WebSplat.Sprite.prototype.isGoody = false;
+///<reference path="websplat.ts" />
 
-    WebSplat.player = null; // no current player
+module WebSplat {
+    Sprite.prototype.isGoody = false;
 
-    WebSplat.addHandler("postload", function() {
+    addHandler("postload", function() {
         var keydown = function(ev) {
             if (ev.ctrlKey || ev.altKey || ev.metaKey) return true;
-            if (WebSplat.player === null) return true;
-            var player = WebSplat.player;
+            if (player === null) return true;
             switch (ev.which) {
                 case 37: // left
                 case 65: // a
                     player.xacc = -1;
-                    player.xaccmax = WebSplat.conf.moveSpeed * -1;
+                    player.xaccmax = conf.moveSpeed * -1;
                     break;
         
                 case 39: // right
                 case 68: // d
                     player.xacc = 1;
-                    player.xaccmax = WebSplat.conf.moveSpeed;
+                    player.xaccmax = conf.moveSpeed;
                     break;
         
                 case 38: // up
@@ -44,11 +43,11 @@
                     if (player.on !== null) {
                         player.jump++;
                         player.on = null;
-                        player.yvel = -WebSplat.conf.jumpSpeed;
+                        player.yvel = -conf.jumpSpeed;
                     } else if (player.jump <= 1) {
                         player.jump = 2;
                         player.powerJump = true;
-                        player.yvel = -WebSplat.conf.jumpSpeed;
+                        player.yvel = -conf.jumpSpeed;
                     }
                     break;
         
@@ -77,8 +76,7 @@
         $(window).keydown(keydown);
         
         var keyup = function(ev) {
-            if (WebSplat.player === null) return true;
-            var player = WebSplat.player;
+            if (player === null) return true;
             switch (ev.which) {
                 case 37: // left
                 case 65: // a
@@ -117,5 +115,4 @@
         $(document.body).keyup(keyup);
         $(window).keyup(keyup);
     });
-
-})();
+}

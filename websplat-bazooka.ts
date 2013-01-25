@@ -14,12 +14,15 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-(function() {
+///<reference path="websplat.ts" />
+///<reference path="websplat-pony.ts" />
+
+module WebSplat {
     var bazRad = 100;
     var bazPower = 50;
     var bazPowerupTime = 2000;
     var bazSpeed = 30;
-    var gd = WebSplat.conf.gridDensity;
+    var gd = conf.gridDensity;
 
     var bazPowerMult = bazPower/bazRad;
 
@@ -37,15 +40,15 @@
         this.mode = this.state = "r";
         this.expended = false;
         this.firedBy = firedBy;
-        WebSplat.Sprite.call(this, "pp2.", rocketLauncherImageSets, true, false);
+        Sprite.call(this, "pp2.", rocketLauncherImageSets, true, false);
         this.slowxacc = 0;
     }
-    Rocket.prototype = new WebSplat.SpriteChild();
+    Rocket.prototype = new SpriteChild();
 
     // FIXME: why is this necessary?
     Rocket.prototype.tick = function() {
         this.thru[this.firedBy.el.wpID] = true;
-        WebSplat.Sprite.prototype.tick.call(this);
+        Sprite.prototype.tick.call(this);
     }
 
     Rocket.prototype.collision = function(els, xs, ys) {
@@ -60,13 +63,13 @@
         this.expended = true;
 
         for (var i = 0; i < els.length; i++) {
-            if (els[i].wpSprite === WebSplat.player)
+            if (els[i].wpSprite === player)
                 console.log("DAMMIT");
         }
 
         // destroy the rocket
-        WebSplat.deplatformSprite(this);
-        WebSplat.remSprite(this);
+        deplatformSprite(this);
+        remSprite(this);
         this.el.parentNode.removeChild(this.el);
 
         // find all the platforms in this region and destroy them
@@ -83,7 +86,7 @@
         // now loop, looking for elements in range
         for (var y = minYB; y <= maxYB; y++) {
             for (var x = minXB; x <= maxXB; x++) {
-                var els = WebSplat.getElementsGridPosition(x, y);
+                var els = getElementsGridPosition(x, y);
                 if (els === null) continue;
                 for (var i = 0; i < els.length; i++) {
                     var el = els[i];
@@ -98,8 +101,8 @@
                             sprite.xvel = Math.cos(angle) * (bazRad - dist) * bazPowerMult * ((dx>0)?1:-1);
                             sprite.forceyvel = Math.sin(angle) * (bazRad - dist) * bazPowerMult * ((dy>0)?1:-1);
                         }
-                    } else if (WebSplat.elInDistance(el, bazRad, bazX, bazY)) {
-                        WebSplat.remElementPosition(el);
+                    } else if (elInDistance(el, bazRad, bazX, bazY)) {
+                        remElementPosition(el);
                         el.style.visibility = "hidden";
                     }
                 }
@@ -113,7 +116,7 @@
     var firing = null;
 
     // firing is delayed by player animation
-    WebSplat.addHandler("ontick", function() {
+    addHandler("ontick", function() {
         if (firing !== null) {
             var player = firing.player;
             if (player.frame >= 16) {
@@ -122,7 +125,7 @@
                 rocket.startingPosition();
                 rocket.xvel = firing.xvel;
                 rocket.yvel = firing.yvel;
-                WebSplat.addSprite(rocket);
+                addSprite(rocket);
                 firing = null;
             }
         }
@@ -135,9 +138,7 @@
     });
 
     $(window).mouseup(function(ev) {
-        if (WebSplat.player === null) return true;
-        var player = WebSplat.player;
-
+        if (player === null) return true;
         if (mdStart === null) return true;
 
         // how long have we been holding it down?
@@ -155,7 +156,7 @@
         var xvel = Math.cos(angle) * bazSpeed * bazTime;
         var yvel = Math.sin(angle) * bazSpeed * bazTime;
 
-        if (player instanceof WebSplat.Pony) {
+        if (player instanceof Pony) {
             player.state = "c";
             player.frame = 0;
             if (xvel < 0) {
@@ -175,4 +176,4 @@
         ev.stopPropagation();
         return false;
     });
-})();
+}

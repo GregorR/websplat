@@ -14,7 +14,9 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-(function() {
+///<reference path="websplat.ts" />
+
+module WebSplat {
     var ponyConf = {
         dogs: ["pp2."],
         moveSpeed: 3,
@@ -40,17 +42,16 @@
         }
     }
 
-    function Pony() {
+    export function Pony() {
         this.mode = this.state = "r";
-        WebSplat.Sprite.call(this,
-            ponyConf.dogs[WebSplat.getRandomInt(0, ponyConf.dogs.length)],
+        Sprite.call(this,
+            ponyConf.dogs[getRandomInt(0, ponyConf.dogs.length)],
             ponyImageSets, true, true);
         this.munching = false;
         this.xacc = 0;
         this.updateImage();
     }
-    WebSplat.Pony = Pony;
-    Pony.prototype = new WebSplat.SpriteChild();
+    Pony.prototype = new SpriteChild();
     Pony.prototype.isBaddy = true;
 
     Pony.prototype.updateImagePrime = function() {
@@ -96,8 +97,8 @@
         }
 
         // do a normal round
-        WebSplat.Sprite.prototype.tick.call(this);
-        if (WebSplat.player === this) return;
+        Sprite.prototype.tick.call(this);
+        if (player === this) return;
 
         // only do anything if we're on a platform
         if (!this.munching && this.on !== null) {
@@ -124,7 +125,7 @@
 
     // is their no platform at this X?
     Pony.prototype.noPlatform = function(x) {
-        var els = WebSplat.getElementsByBoxThru(this, this.thru, false, x, ponyConf.edgeDetectSize, this.y+this.h, ponyConf.edgeDetectSize);
+        var els = getElementsByBoxThru(this, this.thru, false, x, ponyConf.edgeDetectSize, this.y+this.h, ponyConf.edgeDetectSize);
         if (els === null) return true;
         return false;
     }
@@ -151,20 +152,20 @@
 
         // then remove it
         var spthis = this;
-        WebSplat.deplatformSprite(spthis);
+        deplatformSprite(spthis);
         setTimeout(function() {
-            WebSplat.remSprite(spthis);
+            remSprite(spthis);
             spthis.el.style.display = "none";
         }, 5000);
     }
 
     // by default, stick some diamond dog in the game
-    WebSplat.addHandler("postload", function() {
+    addHandler("postload", function() {
         var last = null;
         // create some diamond dogs!
-        WebSplat.spritesOnPlatform(ponyImageSets.r.width, ponyImageSets.r.height,
+        spritesOnPlatform(ponyImageSets.r.width, ponyImageSets.r.height,
             480, 480*320, function() { return (last = new Pony()); });
-        WebSplat.player = last;
-        WebSplat.assertPlayerViewport();
+        player = last;
+        assertPlayerViewport();
     });
-})();
+}
