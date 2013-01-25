@@ -11,8 +11,11 @@ JS_FILES=$(TS_FILES:.ts=.js)
 
 all: $(JS_FILES)
 
-%.js: %.ts
-	$(TSC) $(TSC_FLAGS) jquery.d.ts $< || ( rm -f $@ ; false )
+%.js: %.ts jquery.d.ts
+	$(TSC) $(TSC_FLAGS) $< || ( rm -f $@ ; false )
+
+jquery.d.ts:
+	cp "`which $(TSC) | xargs dirname`"/jquery.d.ts .
 
 cont:
 	@while true; do \
@@ -21,4 +24,4 @@ cont:
 	done
 
 clean:
-	rm -f $(JS_FILES)
+	rm -f $(JS_FILES) jquery.d.ts

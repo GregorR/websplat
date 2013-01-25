@@ -14,6 +14,8 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+///<reference path="jquery.d.ts" />
+
 //<style implicitAny="on" />
 //<style eqeqeq="on" />
 
