@@ -17,7 +17,7 @@
 ///<reference path="websplat.ts" />
 
 module WebSplat {
-    Sprite.prototype.isGoody = false;
+    var pressingUp = false;
 
     addHandler("postload", function() {
         var keydown = function(ev) {
@@ -38,15 +38,10 @@ module WebSplat {
         
                 case 38: // up
                 case 87: // w
-                    if ("pressingUp" in player) break;
-                    player.pressingUp = true;
+                    if (pressingUp) break;
+                    pressingUp = true;
                     if (player.on !== null) {
-                        player.jump++;
                         player.on = null;
-                        player.yvel = -conf.jumpSpeed;
-                    } else if (player.jump <= 1) {
-                        player.jump = 2;
-                        player.powerJump = true;
                         player.yvel = -conf.jumpSpeed;
                     }
                     break;
@@ -65,7 +60,7 @@ module WebSplat {
 
                 case 70: // f
                 case 32: // space
-                    player.specialOn();
+                    //player.specialOn();
                     break;
             }
         
@@ -96,7 +91,7 @@ module WebSplat {
         
                 case 38: // up
                 case 87: // w
-                    delete player.pressingUp;
+                    pressingUp = false;
                     break;
         
                 case 40: // down
@@ -105,7 +100,7 @@ module WebSplat {
 
                 case 70: // f
                 case 32: // space
-                    player.specialOff();
+                    //player.specialOff();
                     break;
             }
         

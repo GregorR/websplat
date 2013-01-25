@@ -37,10 +37,9 @@ module WebSplat {
     };
 
     function Rocket(firedBy) {
-        this.mode = this.state = "r";
         this.expended = false;
         this.firedBy = firedBy;
-        Sprite.call(this, "pp2.", rocketLauncherImageSets, true, false);
+        Sprite.call(this, "pp2.", rocketLauncherImageSets, "r", "r", true, false);
         this.slowxacc = 0;
     }
     Rocket.prototype = new SpriteChild();
@@ -156,7 +155,7 @@ module WebSplat {
         var xvel = Math.cos(angle) * bazSpeed * bazTime;
         var yvel = Math.sin(angle) * bazSpeed * bazTime;
 
-        if (player instanceof Pony) {
+        if (<any>player instanceof Pony) {
             player.state = "c";
             player.frame = 0;
             if (xvel < 0) {

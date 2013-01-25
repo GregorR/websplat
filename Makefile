@@ -3,7 +3,6 @@ TSC_FLAGS=-c
 
 TS_FILES=\
     websplat.ts \
-    websplat-baddy.ts \
     websplat-pony.ts \
     websplat-goody.ts \
     websplat-bazooka.ts

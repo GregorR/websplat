@@ -14,22 +14,14 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-///<style implicitAny="on" />
-///<style eqeqeq="on" />
+//<style implicitAny="on" />
+//<style eqeqeq="on" />
 
 // from loader.js
 declare function wpDisplayMessage(): void;
 
 module WebSplat {
-    // temporary
-    export interface Sprite {
-        isPlatform: bool;
-        el: any;
-        setXY(x: number, y: number): void;
-        startingPosition(): void;
-    }
-
-    export var player: any = null;
+    export var player: Sprite = null;
 
     // configuration:
     export var conf = {
@@ -610,409 +602,429 @@ module WebSplat {
     }
 
     // the Sprite "class", which represents an object with accelerative movement and displayed as an image
-    export function Sprite(imageBase: string, imageSets: any, hasGravity: bool, isPlatform: bool) {
-        this.imageBase = imageBase;
-        this.imageSets = imageSets;
-        this.hasGravity = hasGravity;
-        this.isPlatform = isPlatform;
+    export class Sprite {
+        public el: any;
+        public x: number;
+        public y: number;
+        public w: number;
+        public h: number;
+        public dir: string;
+        public frame: number;
+        public xioff: number;
+        public yioff: number;
+        public xvel: number;
+        public yvel: number;
+        public xacc: any; // FIXME: number or false
+        public xaccmax: any; // FIXME: number or false
+        public slowxacc: number;
+        public yacc: any; // FIXME: number or false
+        public zap: any; // FIXME: number or false
+        public leftOf: any[];
+        public rightOf: any[];
+        public above: any[];
+        public on: any[];
+        public thru: any;
+        public images: any;
+        public useCanvas: bool;
+        public drawn: any; // FIXME: string or null
 
-        // default to the mode and state "s"
-        if (typeof(this.mode) === "undefined")
-            this.mode = "s";
-        if (typeof(this.state) === "undefined")
-            this.state = "s";
-        this.dir = "r";
-        this.frame = 0;
-
-        // useless default location and size
-        this.x = 0;
-        this.y = 0;
-        this.xioff = 0;
-        this.yioff = 0;
-        try {
-            this.w = imageSets["s"].width;
-            this.h = imageSets["s"].height;
-        } catch (ex) {
-            this.w = 0;
-            this.h = 0;
-        }
-
-        // useless default speed and acceleration
-        this.xvel = 0;
-        this.xacc = false; // false means "stop"
-        this.xaccmax = false; // the maximum velocity we can get to by acceleration
-        this.slowxacc = 1; // slowdown due to "friction"
-        this.yvel = 0;
-        this.yacc = false; // less meaningful here
-
-        // are we being zapped?
-        this.zap = false;
-
-        // what elements are left of us?
-        this.leftOf = null;
-
-        // what elements are right of us?
-        this.rightOf = null;
-
-        // what elements are above us?
-        this.above = null;
-
-        // what elements are we standing on?
-        this.on = null;
+        constructor(public imageBase: string, public imageSets: any,
+                    public mode: string, public state: string, 
+                    public hasGravity: bool, public isPlatform: bool) {
+            this.dir = "r";
+            this.frame = 0;
     
-        // what elements are we clipping through?
-        this.thru = {};
-
-        // load all the images
-        if (typeof(this.images) === "undefined") {
-            var images = this.images = {};
-            var state: string;
-            for (state in imageSets) {
-                var imgSet: any = imageSets[state];
-                var dir: string;
-                for (dir in {"r":0,"l":0}) {
-                    for (var i = 0; i < imgSet.frames; i++) {
-                        if ("frameAliases" in imgSet && imgSet.frameAliases[i] !== i) continue;
-                        var img = new Image();
-                        if (imageBase.match(/\/\//)) {
-                            img.src = imageBase + state + i + dir + ".png";
-                        } else {
-                            img.src = conf.imageBase + imageBase + state + i + dir + ".png";
+            // useless default location and size
+            this.x = 0;
+            this.y = 0;
+            this.xioff = 0;
+            this.yioff = 0;
+            try {
+                this.w = imageSets["s"].width;
+                this.h = imageSets["s"].height;
+            } catch (ex) {
+                this.w = 0;
+                this.h = 0;
+            }
+    
+            // useless default speed and acceleration
+            this.xvel = 0;
+            this.xacc = false; // false means "stop"
+            this.xaccmax = false; // the maximum velocity we can get to by acceleration
+            this.slowxacc = 1; // slowdown due to "friction"
+            this.yvel = 0;
+            this.yacc = false; // less meaningful here
+    
+            // are we being zapped?
+            this.zap = false;
+    
+            // what elements are left of us?
+            this.leftOf = null;
+    
+            // what elements are right of us?
+            this.rightOf = null;
+    
+            // what elements are above us?
+            this.above = null;
+    
+            // what elements are we standing on?
+            this.on = null;
+        
+            // what elements are we clipping through?
+            this.thru = {};
+    
+            // load all the images
+            if (typeof(this.images) === "undefined") {
+                var images = this.images = {};
+                var state: string;
+                for (state in imageSets) {
+                    var imgSet: any = imageSets[state];
+                    var dir: string;
+                    for (dir in {"r":0,"l":0}) {
+                        for (var i = 0; i < imgSet.frames; i++) {
+                            if ("frameAliases" in imgSet && imgSet.frameAliases[i] !== i) continue;
+                            var img = new Image();
+                            if (imageBase.match(/\/\//)) {
+                                img.src = imageBase + state + i + dir + ".png";
+                            } else {
+                                img.src = conf.imageBase + imageBase + state + i + dir + ".png";
+                            }
+                            images[state + i + dir] = img;
                         }
-                        images[state + i + dir] = img;
                     }
                 }
             }
-        }
-
-        // create the img element that is the actual display of the sprite
-        this.el = document.createElement("canvas");
-        this.useCanvas = true;
-        if (!("getContext" in this.el)) {
-            this.el = document.createElement("img");
-            this.useCanvas = false;
-        }
-        this.el.wpSprite = this;
-        this.el.style.padding = this.el.style.margin = "0px";
-
-        this.drawn = null;
-        this.draw(this.state, "r", 0);
-
-        this.el.style.color = "black";
-        this.el.style.position = "absolute";
-        this.el.style.zIndex = "1000000";
-        this.el.style.fontSize = "20px";
-        document.body.appendChild(this.el);
-
-        // if it's a sprite platform, we want a faster getClientRects than the builtin one
-        if (isPlatform) {
-            this.el.getClientRects = function() {
-                var scrollTop = document.documentElement.scrollTop ||
-                    document.body.scrollTop;
-                var scrollLeft = document.documentElement.scrollLeft ||
-                    document.body.scrollLeft;
-
-                return [{
-                    left: this.wpSprite.x - scrollLeft,
-                    top: this.wpSprite.y - scrollTop,
-                    right: this.wpSprite.x + this.wpSprite.w - scrollLeft,
-                    bottom: this.wpSprite.y + this.wpSprite.h - scrollTop
-                }];
+    
+            // create the img element that is the actual display of the sprite
+            this.el = document.createElement("canvas");
+            this.useCanvas = true;
+            if (!("getContext" in this.el)) {
+                this.el = document.createElement("img");
+                this.useCanvas = false;
             }
-        }
-
-        this.setXY(0, 0);
-        this.updateImage();
-    }
-    export function SpriteChild() {}
-    SpriteChild.prototype = Sprite.prototype;
-
-    // (private) draw an image
-    Sprite.prototype.draw = function(state: string, dir: string, num: number) {
-        var toDraw = state + num + dir;
-        if (this.drawn === toDraw) return;
-
-        var imgSet = this.imageSets[state];
-        this.el.width = imgSet.width;
-        this.el.height = imgSet.height;
-        this.el.style.width = imgSet.width + "px";
-        this.el.style.height = imgSet.height + "px";
-
-        var img = this.images[toDraw];
-        if (!("complete" in img) ||
-            (img.complete && img.width > 0 && img.height > 0)) {
-            this.el.style.border = "0px";
-            if (this.useCanvas) {
-                var ctx = this.el.getContext("2d");
-                ctx.drawImage(img, 0, 0);
-            } else {
-                this.el.src = img.src;
-            }
-            this.drawn = toDraw;
-        } else {
-            this.el.style.border = "1px solid red";
+            this.el.wpSprite = this;
+            this.el.style.padding = this.el.style.margin = "0px";
+    
             this.drawn = null;
-        }
-    }
-
-    // usually part of tick, update the image
-    Sprite.prototype.updateImage = function() {
-        // image change
-        this.frame++;
-        if (this.frame > 1024) this.frame = 0;
-
-        // choose our direction
-        if (this.xvel > 0) {
-            this.dir = "r";
-        } else if (this.xvel < 0) {
-            this.dir = "l";
-        } else if (this.xacc > 0) {
-            this.dir = "r";
-        } else if (this.xacc < 0) {
-            this.dir = "l";
-        }
-
-        this.updateImagePrime();
-
-        // but forcibly be zapped if they say so
-        if (this.zap !== false) {
-            this.state = "z";
-            this.zap--;
-            if (this.zap <= 0) this.zap = false;
-        }
-
-        // get the image and frame
-        var imgSet = this.imageSets[this.state];
-        var frame = Math.floor(this.frame/imgSet.frameRate) % imgSet.frames;
-
-        // frames can be aliased
-        if ("frameAliases" in imgSet) {
-            frame = imgSet.frameAliases[frame];
-        }
-
-        // and bounding boxes can be reduced
-        var bb = [1, 2, 1, 2];
-        if ("bb" in imgSet) {
-            bb = imgSet.bb;
-            if (this.dir === "l") {
-                if ("bbl" in imgSet) {
-                    bb = imgSet.bbl;
-                } else {
-                    bb = bb.slice(0);
-                    bb[0] = bb[1] - bb[0];
-                    imgSet.bbl = bb;
+            this.draw(this.state, "r", 0);
+    
+            this.el.style.color = "black";
+            this.el.style.position = "absolute";
+            this.el.style.zIndex = "1000000";
+            this.el.style.fontSize = "20px";
+            document.body.appendChild(this.el);
+    
+            // if it's a sprite platform, we want a faster getClientRects than the builtin one
+            if (isPlatform) {
+                this.el.getClientRects = function() {
+                    var scrollTop = document.documentElement.scrollTop ||
+                        document.body.scrollTop;
+                    var scrollLeft = document.documentElement.scrollLeft ||
+                        document.body.scrollLeft;
+    
+                    return [{
+                        left: this.wpSprite.x - scrollLeft,
+                        top: this.wpSprite.y - scrollTop,
+                        right: this.wpSprite.x + this.wpSprite.w - scrollLeft,
+                        bottom: this.wpSprite.y + this.wpSprite.h - scrollTop
+                    }];
                 }
             }
-        }
-        this.xioff = bb[0];
-        this.yioff = bb[2];
-
-        this.draw(this.state, this.dir, frame);
-
-        // and check for width/height changes
-        if (this.w !== imgSet.width - bb[1]) {
-            // adjust left by half the difference (or right for shrinking)
-            this.x -= Math.floor((imgSet.width - bb[1] - this.w)/2);
-        }
-        if (this.h !== imgSet.height - bb[3]) {
-            // adjust up by the full difference
-            this.y -= imgSet.height - bb[3] - this.h;
-        }
-
-        this.w = imgSet.width - bb[1];
-        this.h = imgSet.height - bb[3];
-    }
-
-    // override this for sprites that actually change
-    Sprite.prototype.updateImagePrime = function() {}
-
-    // set the X and Y (usually used internally by tick)
-    Sprite.prototype.setXY = function(x: number, y: number) {
-        this.x = x;
-        this.y = y;
     
-        this.el.style.left = Math.floor(this.x-this.xioff) + "px";
-        this.el.style.top = Math.floor(this.y-this.yioff) + "px";
-
-        // make sure it remains a platform
-        if (this.isPlatform) {
-            movElementPosition(this.el);
-            this.thru[this.el.wpID] = true;
+            this.setXY(0, 0);
+            this.updateImage();
         }
-    }
 
-    // perform a tick of this sprite
-    Sprite.prototype.tick = function() {
-        if (!this.onScreen()) return;
-
-        this.updateImage();
-
-        // get the acceleration from our platform
-        var realxacc = this.xacc;
-        if (this.xacc === false) realxacc = 0;
-        var slowxacc = this.slowxacc;
-        if (this.on === null) {
-            realxacc *= conf.jumpAcc;
-            slowxacc *= conf.jumpSlowAcc;
-        } else {
-            realxacc *= conf.runAcc;
-            slowxacc *= conf.runSlowAcc;
+        // draw an image
+        private draw(state: string, dir: string, num: number) {
+            var toDraw = state + num + dir;
+            if (this.drawn === toDraw) return;
+    
+            var imgSet = this.imageSets[state];
+            this.el.width = imgSet.width;
+            this.el.height = imgSet.height;
+            this.el.style.width = imgSet.width + "px";
+            this.el.style.height = imgSet.height + "px";
+    
+            var img = this.images[toDraw];
+            if (!("complete" in img) ||
+                (img.complete && img.width > 0 && img.height > 0)) {
+                this.el.style.border = "0px";
+                if (this.useCanvas) {
+                    var ctx = this.el.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+                } else {
+                    this.el.src = img.src;
+                }
+                this.drawn = toDraw;
+            } else {
+                this.el.style.border = "1px solid red";
+                this.drawn = null;
+            }
         }
-        var appgravity = this.hasGravity ? ("ownGravity" in this) ? this.ownGravity : conf.gravity : 0;
-        var gravs = (appgravity >= 0) ? 1 : -1;
-        var realyacc = appgravity;
-        if (this.yacc !== false) realyacc += this.yacc;
- 
-
-        // acceleration
-        var xas = (this.xacc >= 0) ? 1 : -1;
-        this.yvel += realyacc;
-        if (this.yacc !== false && this.yvel < conf.flyMax)
-            this.yvel = conf.flyMax;
-        if (this.xacc === false) {
-            // slow down!
+    
+        // usually part of tick, update the image
+        private updateImage() {
+            // image change
+            this.frame++;
+            if (this.frame > 1024) this.frame = 0;
+    
+            // choose our direction
             if (this.xvel > 0) {
-                this.xvel -= slowxacc;
-                if (this.xvel < 0) this.xvel = 0;
+                this.dir = "r";
             } else if (this.xvel < 0) {
-                this.xvel += slowxacc;
-                if (this.xvel > 0) this.xvel = 0;
+                this.dir = "l";
+            } else if (this.xacc > 0) {
+                this.dir = "r";
+            } else if (this.xacc < 0) {
+                this.dir = "l";
             }
-        } else if (this.xaccmax === false || this.xvel*xas < this.xaccmax*xas) {
-            this.xvel += realxacc;
-            if (this.xaccmax !== false && this.xvel*xas >= this.xaccmax*xas) {
-                this.xvel = this.xaccmax;
-            }
-        }
-  
-        this.postAcc();
     
-
-        // then velocity
-        // signs we need
-        var xs = (this.xvel >= 0) ? 1 : -1;
-        var ys = (this.yvel >= 0) ? 1 : -1;
-
-        // x first
-        var x = this.x;
-        var xe = x + this.xvel;
-        this.rightOf = this.leftOf = null;
-        for (; x*xs <= xe*xs; x += xs) {
-            var els = getElementsByBoxThru(this, this.thru, false, x, this.w, this.y, this.h-conf.hopAbove);
-            if (els !== null) {
-                els = this.collision(els, xs, 0);
-                if (els === null) continue;
-
-                if (xs >= 0) {
-                    this.rightOf = els;
-                } else {
-                    this.leftOf = els;
-                }
-
-                this.xvel = x - this.x;
-                break;
+            this.updateImagePrime();
+    
+            // but forcibly be zapped if they say so
+            if (this.zap !== false) {
+                this.state = "z";
+                this.zap--;
+                if (this.zap <= 0) this.zap = false;
             }
-        }
-        if (x !== this.x) x -= xs;
-        if ("forcexvel" in this) {
-            this.xvel = this.forcexvel;
-            delete this.forcexvel;
-        }
-
-        // if we need to hop, do so
-        while (x !== this.x &&
-            this.collision(
-                getElementsByBoxThru(this, this.thru, false, x, this.w, this.y+this.h-conf.hopAbove, conf.hopAbove),
-                0, ys, true) !== null) {
-            this.y--;
+    
+            // get the image and frame
+            var imgSet = this.imageSets[this.state];
+            var frame = Math.floor(this.frame/imgSet.frameRate) % imgSet.frames;
+    
+            // frames can be aliased
+            if ("frameAliases" in imgSet) {
+                frame = imgSet.frameAliases[frame];
+            }
+    
+            // and bounding boxes can be reduced
+            var bb = [1, 2, 1, 2];
+            if ("bb" in imgSet) {
+                bb = imgSet.bb;
+                if (this.dir === "l") {
+                    if ("bbl" in imgSet) {
+                        bb = imgSet.bbl;
+                    } else {
+                        bb = bb.slice(0);
+                        bb[0] = bb[1] - bb[0];
+                        imgSet.bbl = bb;
+                    }
+                }
+            }
+            this.xioff = bb[0];
+            this.yioff = bb[2];
+    
+            this.draw(this.state, this.dir, frame);
+    
+            // and check for width/height changes
+            if (this.w !== imgSet.width - bb[1]) {
+                // adjust left by half the difference (or right for shrinking)
+                this.x -= Math.floor((imgSet.width - bb[1] - this.w)/2);
+            }
+            if (this.h !== imgSet.height - bb[3]) {
+                // adjust up by the full difference
+                this.y -= imgSet.height - bb[3] - this.h;
+            }
+    
+            this.w = imgSet.width - bb[1];
+            this.h = imgSet.height - bb[3];
         }
     
-        // then y
-        var y = this.y;
-        var ye = y + this.yvel;
-        var leading = (ys>=0) ? this.h : 0;
-        this.above = this.on = null; // default to not being on anything
-        for (; y*ys <= ye*ys; y += ys) {
-            var els = getElementsByBoxThru(this, this.thru, false, x, this.w, y+leading, 0);
-            if (els !== null) {
-                els = this.collision(els, 0, ys);
-                if (els === null) continue;
-
-                // get more elements to drop through if we duck
-                var morels = getElementsByBoxThru(this, this.thru, false, x, this.w, y + this.crouchThru*ys, this.h);
-                if (morels !== null) els.push.apply(els, morels);
-
-                // then fail
-                if (ys*gravs >= 0) {
-                    this.on = els;
-                } else {
-                    this.above = els;
-                }
-                this.yvel = y - this.y;
-                break;
-            }
-        }
-        if (y !== this.y) y -= ys;
-        if ("forceyvel" in this) {
-            this.yvel = this.forceyvel;
-            delete this.forceyvel;
-        }
-
-        // get our thrulist correct by getting around our location
-        getElementsByBoxThru(this, this.thru, true, x-1, this.w+2, y-1, this.h+2);
-
-        // bounds
-        if (x < 0) {
-            if (this.leftOf === null) this.leftOf = [];
-            x = 0;
-        }
-        if (x + this.w > maxX) {
-            if (this.rightOf === null) this.rightOf = [];
-            x = maxX - this.w;
-        }
-        if (y < -240) y = -240;
-        if (y + this.h > conf.maxY + 100) {
-            if (this.on === null) this.on = [];
-            y = conf.maxY - this.h + 100;
+        // override this for sprites that actually change
+        public updateImagePrime() {}
+    
+        // set the X and Y (usually used internally by tick)
+        public setXY(x: number, y: number) {
             this.x = x;
             this.y = y;
-            this.hitBottom();
-            x = this.x;
-            y = this.y;
-        }
-
-        // now set the location
-        this.setXY(x, y);
-    }
-
-    // override if you need it
-    Sprite.prototype.postAcc = function() {}
-    Sprite.prototype.collision = function(els: any[], xs: number, ys: number) {return els;}
-    Sprite.prototype.hitBottom = function() {}
-    Sprite.prototype.takeDamage = function(from: Sprite, pts: number) {return false;} // returns true if killed
-    Sprite.prototype.doDamage = function(to: Sprite, pts: number) {}
-
-    // make this a starting position by figuring out what we're clipping through
-    Sprite.prototype.startingPosition = function() {
-        var thru = {};
-        var gothru = getElementsByBox(this.x, this.w, this.y, this.h);
-        if (gothru !== null) {
-            for (var i = 0; i < gothru.length; i++) {
-                thru[gothru[i].wpID] = true;
+        
+            this.el.style.left = Math.floor(this.x-this.xioff) + "px";
+            this.el.style.top = Math.floor(this.y-this.yioff) + "px";
+    
+            // make sure it remains a platform
+            if (this.isPlatform) {
+                movElementPosition(this.el);
+                this.thru[this.el.wpID] = true;
             }
         }
-        this.thru = thru;
+    
+        // perform a tick of this sprite
+        public tick() {
+            if (!this.onScreen()) return;
+    
+            this.updateImage();
+    
+            // get the acceleration from our platform
+            var realxacc = this.xacc;
+            if (this.xacc === false) realxacc = 0;
+            var slowxacc = this.slowxacc;
+            if (this.on === null) {
+                realxacc *= conf.jumpAcc;
+                slowxacc *= conf.jumpSlowAcc;
+            } else {
+                realxacc *= conf.runAcc;
+                slowxacc *= conf.runSlowAcc;
+            }
+            var appgravity = this.hasGravity ? ("ownGravity" in this) ? (<any>this).ownGravity : conf.gravity : 0;
+            var gravs = (appgravity >= 0) ? 1 : -1;
+            var realyacc = appgravity;
+            if (this.yacc !== false) realyacc += this.yacc;
+     
+    
+            // acceleration
+            var xas = (this.xacc >= 0) ? 1 : -1;
+            this.yvel += realyacc;
+            if (this.yacc !== false && this.yvel < conf.flyMax)
+                this.yvel = conf.flyMax;
+            if (this.xacc === false) {
+                // slow down!
+                if (this.xvel > 0) {
+                    this.xvel -= slowxacc;
+                    if (this.xvel < 0) this.xvel = 0;
+                } else if (this.xvel < 0) {
+                    this.xvel += slowxacc;
+                    if (this.xvel > 0) this.xvel = 0;
+                }
+            } else if (this.xaccmax === false || this.xvel*xas < this.xaccmax*xas) {
+                this.xvel += realxacc;
+                if (this.xaccmax !== false && this.xvel*xas >= this.xaccmax*xas) {
+                    this.xvel = this.xaccmax;
+                }
+            }
+      
+            this.postAcc();
+        
+    
+            // then velocity
+            // signs we need
+            var xs = (this.xvel >= 0) ? 1 : -1;
+            var ys = (this.yvel >= 0) ? 1 : -1;
+    
+            // x first
+            var x = this.x;
+            var xe = x + this.xvel;
+            this.rightOf = this.leftOf = null;
+            for (; x*xs <= xe*xs; x += xs) {
+                var els = getElementsByBoxThru(this, this.thru, false, x, this.w, this.y, this.h-conf.hopAbove);
+                if (els !== null) {
+                    els = this.collision(els, xs, 0);
+                    if (els === null) continue;
+    
+                    if (xs >= 0) {
+                        this.rightOf = els;
+                    } else {
+                        this.leftOf = els;
+                    }
+    
+                    this.xvel = x - this.x;
+                    break;
+                }
+            }
+            if (x !== this.x) x -= xs;
+            if ("forcexvel" in this) {
+                this.xvel = (<any>this).forcexvel;
+                delete (<any>this).forcexvel;
+            }
+    
+            // if we need to hop, do so
+            while (x !== this.x &&
+                this.collision(
+                    getElementsByBoxThru(this, this.thru, false, x, this.w, this.y+this.h-conf.hopAbove, conf.hopAbove),
+                    0, ys, true) !== null) {
+                this.y--;
+            }
+        
+            // then y
+            var y = this.y;
+            var ye = y + this.yvel;
+            var leading = (ys>=0) ? this.h : 0;
+            this.above = this.on = null; // default to not being on anything
+            for (; y*ys <= ye*ys; y += ys) {
+                var els = getElementsByBoxThru(this, this.thru, false, x, this.w, y+leading, 0);
+                if (els !== null) {
+                    els = this.collision(els, 0, ys);
+                    if (els === null) continue;
+    
+                    // get more elements to drop through if we duck
+                    var morels = getElementsByBoxThru(this, this.thru, false, x, this.w, y + conf.crouchThru*ys, this.h);
+                    if (morels !== null) els.push.apply(els, morels);
+    
+                    // then fail
+                    if (ys*gravs >= 0) {
+                        this.on = els;
+                    } else {
+                        this.above = els;
+                    }
+                    this.yvel = y - this.y;
+                    break;
+                }
+            }
+            if (y !== this.y) y -= ys;
+            if ("forceyvel" in this) {
+                this.yvel = (<any>this).forceyvel;
+                delete (<any>this).forceyvel;
+            }
+    
+            // get our thrulist correct by getting around our location
+            getElementsByBoxThru(this, this.thru, true, x-1, this.w+2, y-1, this.h+2);
+    
+            // bounds
+            if (x < 0) {
+                if (this.leftOf === null) this.leftOf = [];
+                x = 0;
+            }
+            if (x + this.w > maxX) {
+                if (this.rightOf === null) this.rightOf = [];
+                x = maxX - this.w;
+            }
+            if (y < -240) y = -240;
+            if (y + this.h > conf.maxY + 100) {
+                if (this.on === null) this.on = [];
+                y = conf.maxY - this.h + 100;
+                this.x = x;
+                this.y = y;
+                this.hitBottom();
+                x = this.x;
+                y = this.y;
+            }
+    
+            // now set the location
+            this.setXY(x, y);
+        }
+    
+        // make this a starting position by figuring out what we're clipping through
+        public startingPosition() {
+            var thru = {};
+            var gothru = getElementsByBox(this.x, this.w, this.y, this.h);
+            if (gothru !== null) {
+                for (var i = 0; i < gothru.length; i++) {
+                    thru[gothru[i].wpID] = true;
+                }
+            }
+            this.thru = thru;
+        }
+    
+        // is this sprite onscreen?
+        public onScreen() {
+            var scrollTop = document.documentElement.scrollTop ||
+                document.body.scrollTop;
+            if (this.y+this.h >= scrollTop &&
+                this.y <= scrollTop+$(window).height())
+                return true;
+            return false;
+        }
+
+        // override if you need it
+        public postAcc() {}
+        public collision(els: any[], xs: number, ys: number, fake?: bool) {return els;}
+        public hitBottom() {}
+        public takeDamage(from: Sprite, pts: number) {return false;} // returns true if killed
+        public doDamage(to: Sprite, pts: number) {}
     }
 
-    // is this sprite onscreen?
-    Sprite.prototype.onScreen = function() {
-        var scrollTop = document.documentElement.scrollTop ||
-            document.body.scrollTop;
-        if (this.y+this.h >= scrollTop &&
-            this.y <= scrollTop+$(window).height())
-            return true;
-        return false;
-    }
+    export function SpriteChild() {}
+    SpriteChild.prototype = Sprite.prototype;
 
 
     // do these two boxes intersect?

@@ -43,37 +43,20 @@ module WebSplat {
     }
 
     export function Pony() {
-        this.mode = this.state = "r";
         Sprite.call(this,
             ponyConf.dogs[getRandomInt(0, ponyConf.dogs.length)],
-            ponyImageSets, true, true);
+            ponyImageSets, "r", "r", true, true);
         this.munching = false;
         this.xacc = 0;
         this.updateImage();
     }
     Pony.prototype = new SpriteChild();
-    Pony.prototype.isBaddy = true;
 
     Pony.prototype.updateImagePrime = function() {
         if (this.state === "c" && this.frame >= ponyImageSets.c.frames) {
             this.state = "r";
             this.frame = 0;
         }
-    }
-
-    // don't collide with goodies
-    Pony.prototype.collision = function(els, xs, ys) {
-        if (els === null) return els;
-        var rels = [];
-        for (var i = 0; i < els.length; i++) {
-            if ("wpSprite" in els[i] && els[i].wpSprite.isGoody) {
-                this.thru[els[i].wpID] = true;
-            } else {
-                rels.push(els[i]);
-            }
-        }
-        if (rels.length === 0) return null;
-        return rels;
     }
 
     // every tick, change the acceleration inexplicably
