@@ -107,6 +107,7 @@
     selector.style.backgroundColor = "white";
     selector.style.color = "black";
     selector.style.textAlign = "center";
+    selector.style.height = "3em";
     selector.style.borderBottom = "1px solid black";
     selector.style.paddingBottom = "1em";
     displayMessage(selector);
@@ -122,6 +123,11 @@
     link.href = "http://websplat.bitbucket.org/";
     link.innerHTML = "Brought to you by WebSplat";
     ad.appendChild(link);
+
+    ad.appendChild(dce("br"));
+    var imgsrc = dce("span");
+    imgsrc.innerHTML = "Temporary images are from <a href=\"http://desktop-pony-team.deviantart.com/\">Desktop Ponies</a>";
+    ad.appendChild(imgsrc);
 
     // addthis if we're not interfering
     if (!((window._atc||{}).ver)) {
