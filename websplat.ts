@@ -354,18 +354,16 @@ module WebSplat {
         
             // put it in the hash
             for (var y = elt; y <= elb; y++) {
-                var sy = String(y);
-                if (!(sy in elementPositions)) {
-                    elementPositions[sy] = {};
+                if (!(y in elementPositions)) {
+                    elementPositions[y] = {};
                 }
-                var epy = elementPositions[sy];
+                var epy = elementPositions[y];
         
                 for (var x = ell; x <= elr; x++) {
-                    var sx = String(x);
-                    if (!(sx in epy)) {
-                        epy[sx] = [];
+                    if (!(x in epy)) {
+                        epy[x] = [];
                     }
-                    epy[sx].push(el);
+                    epy[x].push(el);
                 }
             }
         }
@@ -399,21 +397,19 @@ module WebSplat {
         
             // take it from the hash
             for (var y = elt; y <= elb; y++) {
-                var sy = String(y);
-                if (!(sy in elementPositions)) continue;
-                var epy = elementPositions[sy];
+                if (!(y in elementPositions)) continue;
+                var epy = elementPositions[y];
         
                 for (var x = ell; x <= elr; x++) {
-                    var sx = String(x);
-                    if (!(sx in epy)) continue;
-                    var els = epy[sx];
+                    if (!(x in epy)) continue;
+                    var els = epy[x];
                     var outels = [];
 
                     for (var i = 0; i < els.length; i++) {
                         if (els[i] !== el) outels.push(els[i]);
                     }
 
-                    epy[sx] = outels;
+                    epy[x] = outels;
                 }
             }
         }
@@ -1070,9 +1066,8 @@ module WebSplat {
                 // now check for an actual overlap
                 for (var eli = 0; eli < elbox.length; eli++) {
                     var el = elbox[eli];
-                    var elIS = String(el.wpID);
-                    if (elIS in checked) continue;
-                    checked[elIS] = true;
+                    if (el.wpID in checked) continue;
+                    checked[el.wpID] = true;
                     if (typeof(el.wpAllowClip) !== "undefined") continue;
 
                     // check each rect
@@ -1112,7 +1107,7 @@ module WebSplat {
         for (var i = 0; i < inels.length; i++) {
             var inel = inels[i];
             outthru[inel.wpID] = true;
-            if (!(String(inel.wpID) in thru)) {
+            if (!(inel.wpID in thru)) {
                 outels.push(inel);
             }
         }
@@ -1136,10 +1131,10 @@ module WebSplat {
         if (typeof minY === "undefined") minY = 0;
         if (typeof tries === "undefined") tries = 128;
         for (var i = 0; i < tries; i++) {
-            var ybox = String(getRandomInt(minY>>conf.gridDensity, (conf.maxY>>conf.gridDensity)+1));
+            var ybox = getRandomInt(minY>>conf.gridDensity, (conf.maxY>>conf.gridDensity)+1);
             if (!(ybox in elementPositions)) continue;
             var epy = elementPositions[ybox];
-            var xbox = String(getRandomInt(0, (conf.maxX>>conf.gridDensity)+1));
+            var xbox = getRandomInt(0, (conf.maxX>>conf.gridDensity)+1);
             if (!(xbox in epy)) continue;
             var els = epy[xbox];
             if (els.length === 0) continue;
