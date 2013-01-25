@@ -65,8 +65,6 @@ module WebSplat {
         "onplatform": [],
         "onnonplatform": [],
         "ontick": [],
-        "oncollide": [],
-        "onpassthru": [],
         "onpause": [],
         "onresume": []
     };
@@ -1114,9 +1112,7 @@ module WebSplat {
         for (var i = 0; i < inels.length; i++) {
             var inel = inels[i];
             outthru[inel.wpID] = true;
-            if (String(inel.wpID) in thru) {
-                callHandlers("onpassthru", sprite, inel);
-            } else {
+            if (!(String(inel.wpID) in thru)) {
                 outels.push(inel);
             }
         }
