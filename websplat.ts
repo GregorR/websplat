@@ -770,7 +770,7 @@ module WebSplat {
         }
     
         // usually part of tick, update the image
-        private updateImage() {
+        public updateImage() {
             // image change
             this.frame++;
             if (this.frame > 1024) this.frame = 0;
