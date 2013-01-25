@@ -26,14 +26,14 @@ module WebSplat {
     }
 
     var ponyImageSets = {
-        r: {
+        r: <ImageSet> {
             frames: 16,
             frameRate: 3,
             width: 53,
             height: 53,
             bb: [23, 39, 31, 35]
         },
-        c: {
+        c: <ImageSet> {
             frames: 32,
             frameRate: 3,
             width: 82,

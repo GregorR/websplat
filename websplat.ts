@@ -603,7 +603,17 @@ module WebSplat {
         });
     }
 
-    // the Sprite "class", which represents an object with accelerative movement and displayed as an image
+    // an image set for a sprite, essentially one sequence of animation
+    export interface ImageSet {
+        frames: number; // number of frames in this set
+        frameRate: number;
+        width: number; // all images must be the same width and height
+        height: number;
+        bb: number[];
+        frameAliases?: any; // map of frame -> frame
+    }
+
+    // the Sprite class, which represents an object with accelerative movement and displayed as an image
     export class Sprite {
         public el: any;
         public x: number;
@@ -630,7 +640,7 @@ module WebSplat {
         public useCanvas: bool;
         public drawn: any; // FIXME: string or null
 
-        constructor(public imageBase: string, public imageSets: any,
+        constructor(public imageBase: string, public imageSets: any /* really map of imageSets */,
                     public mode: string, public state: string, 
                     public hasGravity: bool, public isPlatform: bool) {
             this.dir = "r";
@@ -680,7 +690,7 @@ module WebSplat {
                 var images = this.images = {};
                 var state: string;
                 for (state in imageSets) {
-                    var imgSet: any = imageSets[state];
+                    var imgSet: ImageSet = imageSets[state];
                     var dir: string;
                     for (dir in {"r":0,"l":0}) {
                         for (var i = 0; i < imgSet.frames; i++) {

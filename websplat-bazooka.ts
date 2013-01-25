@@ -27,7 +27,7 @@ module WebSplat {
     var bazPowerMult = bazPower/bazRad;
 
     var rocketLauncherImageSets = {
-        r: {
+        r: <ImageSet> {
             frames: 1,
             frameRate: 3,
             width: 53,
