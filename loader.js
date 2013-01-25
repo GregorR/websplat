@@ -96,7 +96,7 @@
             "http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js",
             "websplat.js",
             "websplat-baddy.js",
-            "websplat-diamonddog.js",
+            "websplat-pony.js",
             "websplat-goody.js",
             "websplat-bazooka.js",
             "go.js"
