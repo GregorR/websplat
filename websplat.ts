@@ -14,10 +14,21 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+///<style implicitAny="on" />
+///<style eqeqeq="on" />
+
 // from loader.js
 declare function wpDisplayMessage(): void;
 
 module WebSplat {
+    // temporary
+    export interface Sprite {
+        isPlatform: bool;
+        el: any;
+        setXY(x: number, y: number): void;
+        startingPosition(): void;
+    }
+
     export var player: any = null;
 
     // configuration:
@@ -66,11 +77,11 @@ module WebSplat {
         "onresume": []
     };
 
-    export function addHandler(type, func) {
+    export function addHandler(type: string, func: Function) {
         handlers[type].push(func);
     }
 
-    function callHandlers(type, ...eflags: any[]) {
+    function callHandlers(type: string, ...eflags: any[]) {
         var harr = handlers[type];
         var ret = true;
         for (var i = 0; i < harr.length; i++) {
@@ -83,7 +94,7 @@ module WebSplat {
         return ret;
     }
 
-    export function getRandomInt(min, max) {
+    export function getRandomInt(min: number, max: number) {
         return Math.floor(Math.random() * (max - min)) + min;
     }
 
@@ -93,7 +104,7 @@ module WebSplat {
     var curWPID = 0;
 
     // yield
-    function yield(func) {
+    function yield(func: Function) {
         setTimeout(func, 0);
     }
     
@@ -101,7 +112,7 @@ module WebSplat {
     var elementPositions = {};
     
     // initialize element positions
-    function initElementPositions(then) {
+    function initElementPositions(then: Function) {
         var plats = [];
         initElementPlatforms(plats, [document.body], function() {
             // then add all the elements
@@ -115,7 +126,7 @@ module WebSplat {
         });
     }
 
-    function addElementPositions(plats, then) {
+    function addElementPositions(plats: any[], then: Function) {
         var i = 0;
         function steps() {
             var end = i + 100;
@@ -127,7 +138,7 @@ module WebSplat {
                     callHandlers("onplatform", el);
                 }
             }
-            if (i == plats.length) {
+            if (i === plats.length) {
                 then();
             } else {
                 yield(steps);
@@ -137,7 +148,7 @@ module WebSplat {
     }
 
     // initialize platform elements
-    function initElementPlatforms(plats, els, then) {
+    function initElementPlatforms(plats: any[], els: any[], then: Function) {
         var stTime = new Date().getTime();
         var whitespace = /^[ \r\n\t\u00A0]*$/;
 
@@ -171,7 +182,7 @@ module WebSplat {
             var cns = el.childNodes;
             var cnsl = cns.length;
             for (var i = 0; i < cnsl; i++) {
-                var cnode = cns[i];
+                var cnode = <any> cns[i];
                 if (cnode.nodeType === 3) { // Node.TEXT_NODE
                     if (!whitespace.test(cnode.data)) // if it's just whitespace, ignore it
                         hasText = true;
@@ -259,10 +270,10 @@ module WebSplat {
 
                     // now recurse
                     var subels = [];
-                    var spanel;
+                    var spanel: any;
                     while (el.firstChild !== null) {
                         if (el.firstChild.nodeType === 3) { // Node.TEXT_NODE
-                            var chi, chl = el.firstChild.data.length;
+                            var chi: number, chl: number = el.firstChild.data.length;
                             // make a span per character
                             for (chi = 0; chi < chl; chi++) {
                                 var ch = el.firstChild.data[chi];
@@ -317,7 +328,7 @@ module WebSplat {
     }
     
     // add an element at a position
-    export function addElementPosition(el) {
+    export function addElementPosition(el: any) {
         el.wpID = curWPID++;
 
         var scrollTop = document.documentElement.scrollTop ||
@@ -338,7 +349,7 @@ module WebSplat {
             var elt = rect.top + scrollTop;
             var elr = rect.right + scrollLeft;
             var elb = rect.bottom + scrollTop;
-            if (ell == elr || elt == elb) continue;
+            if (ell === elr || elt === elb) continue;
 
             if (elr > maxX) maxX = elr;
             if (elb > maxY) maxY = elb;
@@ -369,7 +380,7 @@ module WebSplat {
     }
 
     // remove this paltform
-    export function remElementPosition(el) {
+    export function remElementPosition(el: any) {
         if (!("wpSavedRects" in el)) return;
 
         var scrollTop = el.wpSavedScrollTop;
@@ -383,7 +394,7 @@ module WebSplat {
             var elt = rect.top + scrollTop;
             var elr = rect.right + scrollLeft;
             var elb = rect.bottom + scrollTop;
-            if (ell == elr || elt == elb) continue;
+            if (ell === elr || elt === elb) continue;
 
             if (elr > maxX) maxX = elr;
             if (elb > maxY) maxY = elb;
@@ -423,13 +434,13 @@ module WebSplat {
     }
 
     // move this element to its new location
-    export function movElementPosition(el) {
+    export function movElementPosition(el: any) {
         remElementPosition(el);
         addElementPosition(el);
     }
 
     // get elements by grid position
-    export function getElementsGridPosition(x, y) {
+    export function getElementsGridPosition(x: number, y: number) {
         var ely = elementPositions[y];
         if (typeof ely === "undefined") return null;
         var els = ely[x];
@@ -438,7 +449,7 @@ module WebSplat {
     }
 
     // is el within max of fromX, fromY?
-    export function elInDistance(el, max, fromX, fromY) {
+    export function elInDistance(el: any, max: number, fromX: number, fromY: number) {
         var scrollTop = el.wpSavedScrollTop;
         var scrollLeft = el.wpSavedScrollLeft;
         var rects = el.wpSavedRects;
@@ -449,7 +460,7 @@ module WebSplat {
             var elr = rect.right + scrollLeft;
             var elt = rect.top + scrollTop;
             var elb = rect.bottom + scrollTop;
-            var cx, cy, dx, dy;
+            var cx: number, cy: number, dx: number, dy: number;
 
             if (ell < fromX) {
                 if (elr < fromX) {
@@ -490,12 +501,12 @@ module WebSplat {
     export var sprites = [];
 
     // add a sprite to the sprite list
-    export function addSprite(sprite) {
+    export function addSprite(sprite: Sprite) {
         sprites.push(sprite);
     }
 
     // deplatform a sprite
-    export function deplatformSprite(sprite) {
+    export function deplatformSprite(sprite: Sprite) {
         if (sprite.isPlatform) {
             remElementPosition(sprite.el);
             sprite.isPlatform = false;
@@ -503,7 +514,7 @@ module WebSplat {
     }
 
     // remove a sprite from the sprite list
-    export function remSprite(sprite) {
+    export function remSprite(sprite: Sprite) {
         // if it's a platform, remove that first
         deplatformSprite(sprite);
 
@@ -539,7 +550,7 @@ module WebSplat {
 
             callHandlers("ontick", this);
 
-            if (sprites.length == 0) {
+            if (sprites.length === 0) {
                 // time to stop!
                 if (gameTimer !== null) {
                     clearTimeout(gameTimer);
@@ -599,7 +610,7 @@ module WebSplat {
     }
 
     // the Sprite "class", which represents an object with accelerative movement and displayed as an image
-    export function Sprite(imageBase, imageSets, hasGravity, isPlatform) {
+    export function Sprite(imageBase: string, imageSets: any, hasGravity: bool, isPlatform: bool) {
         this.imageBase = imageBase;
         this.imageSets = imageSets;
         this.hasGravity = hasGravity;
@@ -655,11 +666,13 @@ module WebSplat {
         // load all the images
         if (typeof(this.images) === "undefined") {
             var images = this.images = {};
-            for (var state in imageSets) {
-                var imgSet = imageSets[state];
-                for (var dir in {"r":0,"l":0}) {
+            var state: string;
+            for (state in imageSets) {
+                var imgSet: any = imageSets[state];
+                var dir: string;
+                for (dir in {"r":0,"l":0}) {
                     for (var i = 0; i < imgSet.frames; i++) {
-                        if ("frameAliases" in imgSet && imgSet.frameAliases[i] != i) continue;
+                        if ("frameAliases" in imgSet && imgSet.frameAliases[i] !== i) continue;
                         var img = new Image();
                         if (imageBase.match(/\/\//)) {
                             img.src = imageBase + state + i + dir + ".png";
@@ -715,7 +728,7 @@ module WebSplat {
     SpriteChild.prototype = Sprite.prototype;
 
     // (private) draw an image
-    Sprite.prototype.draw = function(state, dir, num) {
+    Sprite.prototype.draw = function(state: string, dir: string, num: number) {
         var toDraw = state + num + dir;
         if (this.drawn === toDraw) return;
 
@@ -781,7 +794,7 @@ module WebSplat {
         var bb = [1, 2, 1, 2];
         if ("bb" in imgSet) {
             bb = imgSet.bb;
-            if (this.dir == "l") {
+            if (this.dir === "l") {
                 if ("bbl" in imgSet) {
                     bb = imgSet.bbl;
                 } else {
@@ -797,11 +810,11 @@ module WebSplat {
         this.draw(this.state, this.dir, frame);
 
         // and check for width/height changes
-        if (this.w != imgSet.width - bb[1]) {
+        if (this.w !== imgSet.width - bb[1]) {
             // adjust left by half the difference (or right for shrinking)
             this.x -= Math.floor((imgSet.width - bb[1] - this.w)/2);
         }
-        if (this.h != imgSet.height - bb[3]) {
+        if (this.h !== imgSet.height - bb[3]) {
             // adjust up by the full difference
             this.y -= imgSet.height - bb[3] - this.h;
         }
@@ -814,7 +827,7 @@ module WebSplat {
     Sprite.prototype.updateImagePrime = function() {}
 
     // set the X and Y (usually used internally by tick)
-    Sprite.prototype.setXY = function(x, y) {
+    Sprite.prototype.setXY = function(x: number, y: number) {
         this.x = x;
         this.y = y;
     
@@ -900,14 +913,14 @@ module WebSplat {
                 break;
             }
         }
-        if (x != this.x) x -= xs;
+        if (x !== this.x) x -= xs;
         if ("forcexvel" in this) {
             this.xvel = this.forcexvel;
             delete this.forcexvel;
         }
 
         // if we need to hop, do so
-        while (x != this.x &&
+        while (x !== this.x &&
             this.collision(
                 getElementsByBoxThru(this, this.thru, false, x, this.w, this.y+this.h-conf.hopAbove, conf.hopAbove),
                 0, ys, true) !== null) {
@@ -927,7 +940,7 @@ module WebSplat {
 
                 // get more elements to drop through if we duck
                 var morels = getElementsByBoxThru(this, this.thru, false, x, this.w, y + this.crouchThru*ys, this.h);
-                if (morels != null) els.push.apply(els, morels);
+                if (morels !== null) els.push.apply(els, morels);
 
                 // then fail
                 if (ys*gravs >= 0) {
@@ -939,7 +952,7 @@ module WebSplat {
                 break;
             }
         }
-        if (y != this.y) y -= ys;
+        if (y !== this.y) y -= ys;
         if ("forceyvel" in this) {
             this.yvel = this.forceyvel;
             delete this.forceyvel;
@@ -974,10 +987,10 @@ module WebSplat {
 
     // override if you need it
     Sprite.prototype.postAcc = function() {}
-    Sprite.prototype.collision = function(els, xs, ys) {return els;}
+    Sprite.prototype.collision = function(els: any[], xs: number, ys: number) {return els;}
     Sprite.prototype.hitBottom = function() {}
-    Sprite.prototype.takeDamage = function(from, pts) {return false;} // returns true if killed
-    Sprite.prototype.doDamage = function(to, pts) {}
+    Sprite.prototype.takeDamage = function(from: Sprite, pts: number) {return false;} // returns true if killed
+    Sprite.prototype.doDamage = function(to: Sprite, pts: number) {}
 
     // make this a starting position by figuring out what we're clipping through
     Sprite.prototype.startingPosition = function() {
@@ -1003,14 +1016,15 @@ module WebSplat {
 
 
     // do these two boxes intersect?
-    function boxIntersection(l1, r1, t1, b1, l2, r2, t2, b2) {
+    function boxIntersection(l1: number, r1: number, t1: number, b1: number,
+                             l2: number, r2: number, t2: number, b2: number) {
         var xInt = r1 >= l2 && l1 <= r2;
         var yInt = b1 >= t2 && t1 <= b2;
         return xInt && yInt;
     }
 
     // get any element at this location
-    export function getElementsByBox(l, w, t, h) {
+    export function getElementsByBox(l: number, w: number, t: number, h: number) {
         // get the bins
         var ls = Math.floor(l>>conf.gridDensity);
         var r = l+w;
@@ -1059,12 +1073,13 @@ module WebSplat {
             }
         }
     
-        if (els.length == 0) return null;
+        if (els.length === 0) return null;
         return els;
     }
 
     // get any element at this location we're not currently falling through
-    export function getElementsByBoxThru(sprite, thru, upd, l, w, t, h) {
+    export function getElementsByBoxThru(sprite: Sprite, thru: any, upd: bool,
+                                         l: number, w: number, t: number, h: number) {
         var inels = getElementsByBox(l, w, t, h);
         var outels = [];
         var outthru = {};
@@ -1084,19 +1099,20 @@ module WebSplat {
     
         // then remove from the thru list anything we've already gone through
         if (upd) {
-            for (var tid in thru) {
+            var tid: string;
+            for (tid in thru) {
                 if (!(tid in outthru)) {
                     delete thru[tid];
                 }
             }
         }
     
-        if (outels.length == 0) return null;
+        if (outels.length === 0) return null;
         return outels;
     }
 
     // get a random platform
-    export function randomPlatform(minY, tries) {
+    export function randomPlatform(minY: number, tries: number) {
         if (typeof minY === "undefined") minY = 0;
         if (typeof tries === "undefined") tries = 128;
         for (var i = 0; i < tries; i++) {
@@ -1116,7 +1132,7 @@ module WebSplat {
     }
 
     // get a position over a random platform
-    export function randomPlatformPosition(w, h, minY, tries) {
+    export function randomPlatformPosition(w: number, h: number, minY: number, tries: number) {
         var platform = randomPlatform(minY, tries);
         if (platform === null) {
             // well, we tried!
@@ -1146,7 +1162,9 @@ module WebSplat {
     }
 
     // autoposition this kind of sprite on platforms
-    export function spritesOnPlatform(w, h, minY, frequencyR, cons, tries?) {
+    export function spritesOnPlatform(w: number, h: number, minY: number,
+                                      frequencyR: number, cons: ()=>Sprite,
+                                      tries?: number) {
         var maxY = conf.maxY - minY;
         var count = Math.ceil((conf.maxX*maxY)/frequencyR);
         for (var i = 0; i < count; i++) {
@@ -1159,7 +1177,7 @@ module WebSplat {
     }
 
     var viewportAsserted = false;
-    function assertViewport(left, right, top, bottom) {
+    function assertViewport(left: number, right: number, top: number, bottom: number) {
         // should we scroll?
         var mustScroll = false;
     
@@ -1181,7 +1199,7 @@ module WebSplat {
             var nvx = right - vw + 200;
             if (nvx + vw > maxX) nvx = maxX - vw;
             if (nvx < 0) nvx = 0;
-            if (vx != nvx) {
+            if (vx !== nvx) {
                 mustScroll = true;
                 vx = nvx;
             }
