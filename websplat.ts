@@ -565,7 +565,6 @@ module WebSplat {
                 if (player) {
                     playerIndicator.style.left = (player.x - player.xioff) + "px";
                     playerIndicator.style.top = (player.y - player.yioff - 10) + "px";
-                    assertPlayerViewport();
                 }
 
             }
@@ -1203,7 +1202,6 @@ module WebSplat {
         }
     }
 
-    var viewportAsserted = false;
     function assertViewport(left: number, right: number, top: number, bottom: number) {
         // should we scroll?
         var mustScroll = false;
@@ -1242,9 +1240,7 @@ module WebSplat {
     
         // set it
         if (mustScroll) {
-            viewportAsserted = false;
             window.scroll(Math.floor(vx), Math.floor(vy));
-            viewportAsserted = true;
         }
     }
 
@@ -1254,10 +1250,10 @@ module WebSplat {
     }
 
     // and if they try to scroll themselves, take it back!
-    $(window).scroll(function() {
+    /*$(window).scroll(function() {
         if (viewportAsserted && player !== null)
             assertPlayerViewport();
-    });
+    });*/
 
     export function go() {
         callHandlers("preload");

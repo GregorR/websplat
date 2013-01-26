@@ -63,7 +63,6 @@ module WebSplat {
     }
 
     Rocket.prototype.explode = function() {
-
         // only blow up once
         if (this.expended) return;
         this.expended = true;
@@ -75,6 +74,7 @@ module WebSplat {
 
         curPony = (curPony + 1) % ponies.length;
         player = ponies[curPony];
+        assertPlayerViewport();
         midFire = false;
 
         // find all the platforms in this region and destroy them
