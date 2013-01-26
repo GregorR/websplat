@@ -17,8 +17,11 @@ all: $(JS_FILES)
 jquery.d.ts:
 	cp "`which $(TSC) | xargs dirname`"/jquery.d.ts .
 
-cont: jquery.d.ts
-	@$(TSC) $(TSC_FLAGS) -w $(TS_FILES)
+cont:
+	@while true; do \
+	    inotifywait -e close_write $(TS_FILES) > /dev/null 2> /dev/null; \
+	    $(MAKE) all; \
+	done
 
 clean:
 	rm -f $(JS_FILES) jquery.d.ts
