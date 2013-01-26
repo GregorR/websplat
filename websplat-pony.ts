@@ -17,6 +17,7 @@
 ///<reference path="websplat.ts" />
 
 //<style implicitAny="on" />
+//<style moreImplicitAny="on" />
 //<style eqeqeq="on" />
 
 module WebSplat {
@@ -148,7 +149,6 @@ module WebSplat {
 
     // by default, stick some ponies in the game
     addHandler("postload", function() {
-        var last = null;
         // create some ponies!
         spritesOnPlatform(ponyImageSets.r.width, ponyImageSets.r.height,
             480, 2, ()=> { var p = new Pony(); ponies.push(p); return p; });

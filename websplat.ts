@@ -17,6 +17,7 @@
 ///<reference path="jquery.d.ts" />
 
 //<style implicitAny="on" />
+//<style moreImplicitAny="on" />
 //<style eqeqeq="on" />
 
 // from loader.js
@@ -70,14 +71,14 @@ module WebSplat {
 
     // handlers:
     export var handlers = {
-        "preload": [],
-        "postload": [],
-        "onelement": [],
-        "onplatform": [],
-        "onnonplatform": [],
-        "ontick": [],
-        "onpause": [],
-        "onresume": []
+        "preload": <Function[]> [],
+        "postload": <Function[]> [],
+        "onelement": <Function[]> [],
+        "onplatform": <Function[]> [],
+        "onnonplatform": <Function[]> [],
+        "ontick": <Function[]> [],
+        "onpause": <Function[]> [],
+        "onresume": <Function[]> []
     };
 
     export function addHandler(type: string, func: Function) {
@@ -116,7 +117,7 @@ module WebSplat {
     
     // initialize element positions
     function initElementPositions(then: Function) {
-        var plats = [];
+        var plats: any[] = [];
         initElementPlatforms(plats, [document.body], function() {
             // then add all the elements
             addElementPositions(plats, function() {
@@ -272,7 +273,7 @@ module WebSplat {
                     el.style.width = jqel.css("width");
 
                     // now recurse
-                    var subels = [];
+                    var subels: any[] = [];
                     var spanel: any;
                     while (el.firstChild !== null) {
                         if (el.firstChild.nodeType === 3) { // Node.TEXT_NODE
@@ -414,7 +415,7 @@ module WebSplat {
                 for (var x = ell; x <= elr; x++) {
                     if (!(<any> x in epy)) continue;
                     var els = epy[x];
-                    var outels = [];
+                    var outels: any[] = [];
 
                     for (var i = 0; i < els.length; i++) {
                         if (els[i] !== el) outels.push(els[i]);
@@ -497,7 +498,7 @@ module WebSplat {
     }
 
     // the sprite list
-    export var sprites = [];
+    export var sprites: Sprite[] = [];
 
     // add a sprite to the sprite list
     export function addSprite(sprite: Sprite) {
@@ -518,7 +519,7 @@ module WebSplat {
         deplatformSprite(sprite);
 
         // then remove it from the list
-        var osprites = [];
+        var osprites: Sprite[] = [];
         for (var i = 0; i < sprites.length; i++) {
             if (sprites[i] !== sprite) osprites.push(sprites[i]);
         }
@@ -526,12 +527,12 @@ module WebSplat {
     }
 
     // the main timer
-    var gameTimer = null;
+    var gameTimer: number = null;
 
     // stuff for keeping framerate right
-    var refTime = null;
-    var nextTime = null;
-    var tickNo = null;
+    var refTime: number = null;
+    var nextTime: number = null;
+    var tickNo: number = null;
 
     // perform a tick for every sprite
     function spritesTick() {
@@ -1063,7 +1064,7 @@ module WebSplat {
         var b = t+h;
         var bs = Math.floor(b>>conf.gridDensity);
     
-        var els = [];
+        var els: any[] = [];
         var checked = {};
    
         for (var ys = ts; ys <= bs; ys++) {
@@ -1110,7 +1111,7 @@ module WebSplat {
     export function getElementsByBoxThru(sprite: Sprite, thru: any, upd: bool,
                                          l: number, w: number, t: number, h: number) {
         var inels = getElementsByBox(l, w, t, h);
-        var outels = [];
+        var outels: any[] = [];
         var outthru = {};
     
         if (inels === null) inels = [];
