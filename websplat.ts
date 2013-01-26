@@ -566,6 +566,11 @@ module WebSplat {
                 if (player) {
                     playerIndicator.style.left = (player.x - player.xioff) + "px";
                     playerIndicator.style.top = (player.y - player.yioff - 10) + "px";
+
+                    if (player.xvel || player.yvel) {
+                        // player is moving, assert viewport
+                        assertPlayerViewport();
+                    }
                 }
 
             }
