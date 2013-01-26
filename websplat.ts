@@ -632,11 +632,11 @@ module WebSplat {
         public yioff: number;
         public xvel: number;
         public yvel: number;
-        public xacc: any; // FIXME: number or false
-        public xaccmax: any; // FIXME: number or false
+        public xacc: number;
+        public xaccmax: number;
         public slowxacc: number;
-        public yacc: any; // FIXME: number or false
-        public zap: any; // FIXME: number or false
+        public yacc: number;
+        public zap: number;
         public leftOf: any[];
         public rightOf: any[];
         public above: any[];
@@ -644,7 +644,7 @@ module WebSplat {
         public thru: any;
         public images: any;
         public useCanvas: bool;
-        public drawn: any; // FIXME: string or null
+        public drawn: string;
 
         constructor(public imageBase: string, public imageSets: any /* really map of imageSets */,
                     public mode: string, public state: string, 
@@ -667,14 +667,14 @@ module WebSplat {
     
             // useless default speed and acceleration
             this.xvel = 0;
-            this.xacc = false; // false means "stop"
-            this.xaccmax = false; // the maximum velocity we can get to by acceleration
+            this.xacc = null; // null means "stop"
+            this.xaccmax = null; // the maximum velocity we can get to by acceleration
             this.slowxacc = 1; // slowdown due to "friction"
             this.yvel = 0;
-            this.yacc = false; // less meaningful here
+            this.yacc = null; // less meaningful here
     
             // are we being zapped?
-            this.zap = false;
+            this.zap = null;
     
             // what elements are left of us?
             this.leftOf = null;
@@ -801,10 +801,10 @@ module WebSplat {
             this.updateImagePrime();
     
             // but forcibly be zapped if they say so
-            if (this.zap !== false) {
+            if (this.zap !== null) {
                 this.state = "z";
                 this.zap--;
-                if (this.zap <= 0) this.zap = false;
+                if (this.zap <= 0) this.zap = null;
             }
     
             // get the image and frame
@@ -875,7 +875,7 @@ module WebSplat {
     
             // get the acceleration from our platform
             var realxacc = this.xacc;
-            if (this.xacc === false) realxacc = 0;
+            if (this.xacc === null) realxacc = 0;
             var slowxacc = this.slowxacc;
             if (this.on === null) {
                 realxacc *= conf.jumpAcc;
@@ -887,15 +887,15 @@ module WebSplat {
             var appgravity = this.hasGravity ? ("ownGravity" in this) ? (<any>this).ownGravity : conf.gravity : 0;
             var gravs = (appgravity >= 0) ? 1 : -1;
             var realyacc = appgravity;
-            if (this.yacc !== false) realyacc += this.yacc;
+            if (this.yacc !== null) realyacc += this.yacc;
      
     
             // acceleration
             var xas = (this.xacc >= 0) ? 1 : -1;
             this.yvel += realyacc;
-            if (this.yacc !== false && this.yvel < conf.flyMax)
+            if (this.yacc !== null && this.yvel < conf.flyMax)
                 this.yvel = conf.flyMax;
-            if (this.xacc === false) {
+            if (this.xacc === null) {
                 // slow down!
                 if (this.xvel > 0) {
                     this.xvel -= slowxacc;
@@ -904,9 +904,9 @@ module WebSplat {
                     this.xvel += slowxacc;
                     if (this.xvel > 0) this.xvel = 0;
                 }
-            } else if (this.xaccmax === false || this.xvel*xas < this.xaccmax*xas) {
+            } else if (this.xaccmax === null || this.xvel*xas < this.xaccmax*xas) {
                 this.xvel += realxacc;
-                if (this.xaccmax !== false && this.xvel*xas >= this.xaccmax*xas) {
+                if (this.xaccmax !== null && this.xvel*xas >= this.xaccmax*xas) {
                     this.xvel = this.xaccmax;
                 }
             }
