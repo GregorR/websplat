@@ -870,7 +870,7 @@ module WebSplat {
     
         // perform a tick of this sprite
         public tick() {
-            if (!this.onScreen()) return;
+            //if (!this.onScreen()) return;
     
             this.updateImage();
     

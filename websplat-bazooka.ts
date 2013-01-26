@@ -22,6 +22,7 @@ module WebSplat {
     var bazPower = 50;
     var bazPowerupTime = 2000;
     var bazSpeed = 30;
+    var bazMaxAge = 34;
     var gd = conf.gridDensity;
 
     var bazPowerMult = bazPower/bazRad;
@@ -41,30 +42,31 @@ module WebSplat {
         this.firedBy = firedBy;
         Sprite.call(this, "pp2.", rocketLauncherImageSets, "r", "r", true, false);
         this.slowxacc = 0;
+        this.lifespan = bazMaxAge;
     }
     Rocket.prototype = new SpriteChild();
 
-    // FIXME: why is this necessary?
     Rocket.prototype.tick = function() {
         this.thru[this.firedBy.el.wpID] = true;
         Sprite.prototype.tick.call(this);
+
+        this.lifespan--;
+        if (this.lifespan <= 0) this.explode();
     }
 
     Rocket.prototype.collision = function(els, xs, ys) {
-        var bazX = this.x;
-        var bazY = this.y;
-
         // only for REAL collisions, thank you
         if (els === null) return els;
 
-        // only blow up once
-        if (this.expended) return els;
-        this.expended = true;
+        this.explode();
+        return els;
+    }
 
-        for (var i = 0; i < els.length; i++) {
-            if (els[i].wpSprite === player)
-                console.log("DAMMIT");
-        }
+    Rocket.prototype.explode = function() {
+
+        // only blow up once
+        if (this.expended) return;
+        this.expended = true;
 
         // destroy the rocket
         deplatformSprite(this);
@@ -76,6 +78,8 @@ module WebSplat {
         midFire = false;
 
         // find all the platforms in this region and destroy them
+        var bazX = this.x;
+        var bazY = this.y;
         var minX = bazX - bazRad;
         var maxX = bazX + bazRad;
         var minY = bazY - bazRad;
@@ -111,8 +115,6 @@ module WebSplat {
                 }
             }
         }
-
-        return els;
     }
 
     var mdStart = null;
@@ -136,14 +138,15 @@ module WebSplat {
         }
     });
 
-    $(window).mousedown(function(ev) {
+    $(document.body).mousedown(function(ev) {
         if (firing || midFire) return true;
+        console.log((<any>ev.target).constructor.name);
         mdStart = new Date().getTime();
         ev.preventDefault();
         ev.stopPropagation();
     });
 
-    $(window).mouseup(function(ev) {
+    $(document.body).mouseup(function(ev) {
         if (player === null) return true;
         if (mdStart === null) return true;
 
