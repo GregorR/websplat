@@ -76,16 +76,16 @@ module WebSplat {
                 case 37: // left
                 case 65: // a
                     if (player.xacc < 0) {
-                        player.xacc = false;
-                        player.xaccmax = false;
+                        player.xacc = null;
+                        player.xaccmax = null;
                     }
                     break;
         
                 case 39: // right
                 case 68: // d
                     if (player.xacc > 0) {
-                        player.xacc = false;
-                        player.xaccmax = false;
+                        player.xacc = null;
+                        player.xaccmax = null;
                     }
                     break;
         
