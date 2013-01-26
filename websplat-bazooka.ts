@@ -71,6 +71,10 @@ module WebSplat {
         remSprite(this);
         this.el.parentNode.removeChild(this.el);
 
+        curPony = (curPony + 1) % ponies.length;
+        player = ponies[curPony];
+        midFire = false;
+
         // find all the platforms in this region and destroy them
         var minX = bazX - bazRad;
         var maxX = bazX + bazRad;
@@ -113,10 +117,11 @@ module WebSplat {
 
     var mdStart = null;
     var firing = null;
+    var midFire = false;
 
     // firing is delayed by player animation
     addHandler("ontick", function() {
-        if (firing !== null) {
+        if (!midFire && firing !== null) {
             var player = firing.player;
             if (player.frame >= 16) {
                 var rocket = new Rocket(player);
@@ -126,11 +131,13 @@ module WebSplat {
                 rocket.yvel = firing.yvel;
                 addSprite(rocket);
                 firing = null;
+                midFire = true;
             }
         }
     });
 
     $(window).mousedown(function(ev) {
+        if (firing || midFire) return true;
         mdStart = new Date().getTime();
         ev.preventDefault();
         ev.stopPropagation();

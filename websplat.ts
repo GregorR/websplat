@@ -23,6 +23,17 @@
 declare function wpDisplayMessage(): void;
 
 module WebSplat {
+    // FIXME: temporary
+    export var playerIndicator: any = document.createElement("div");
+    playerIndicator.style.position = "absolute";
+    playerIndicator.style.zIndex = "1000000";
+    playerIndicator.style.background = "white";
+    playerIndicator.style.color = "black"
+    playerIndicator.style.border = "1px solid red";
+    playerIndicator.style.padding = "2px 2px 2px 2px";
+    playerIndicator.innerHTML = "Player";
+    document.body.appendChild(playerIndicator);
+
     export var player: Sprite = null;
 
     // configuration:
@@ -552,6 +563,8 @@ module WebSplat {
                 }
 
                 if (player) {
+                    playerIndicator.style.left = (player.x - player.xioff) + "px";
+                    playerIndicator.style.top = (player.y - player.yioff - 10) + "px";
                     assertPlayerViewport();
                 }
 
@@ -1178,10 +1191,9 @@ module WebSplat {
 
     // autoposition this kind of sprite on platforms
     export function spritesOnPlatform(w: number, h: number, minY: number,
-                                      frequencyR: number, cons: ()=>Sprite,
+                                      count: number, cons: ()=>Sprite,
                                       tries?: number) {
         var maxY = conf.maxY - minY;
-        var count = Math.ceil((conf.maxX*maxY)/frequencyR);
         for (var i = 0; i < count; i++) {
             var b = cons();
             var xy = randomPlatformPosition(w, h, minY, tries);

@@ -20,6 +20,9 @@
 //<style eqeqeq="on" />
 
 module WebSplat {
+    export var ponies: Pony[] = [];
+    export var curPony = 0;
+
     var ponyConf = {
         ponies: ["pp2."],
         moveSpeed: 3,
@@ -64,7 +67,7 @@ module WebSplat {
         }
 
         // every tick, change the acceleration inexplicably
-        public tick() {
+        /*public tick() {
             if (!this.onScreen()) return;
 
             if (this.dead) {
@@ -108,7 +111,7 @@ module WebSplat {
                 // don't let them go above the screen
                 this.setXY(this.x, 0);
             }
-        }
+        }*/
 
         // is their no platform at this X?
         public noPlatform(x: number) {
@@ -148,8 +151,8 @@ module WebSplat {
         var last = null;
         // create some ponies!
         spritesOnPlatform(ponyImageSets.r.width, ponyImageSets.r.height,
-            480, 480*320, function() { return (last = new Pony()); });
-        player = last;
+            480, 2, ()=> { var p = new Pony(); ponies.push(p); return p; });
+        player = ponies[0];
         assertPlayerViewport();
     });
 }
