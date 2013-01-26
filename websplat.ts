@@ -980,7 +980,7 @@ module WebSplat {
                     } else {
                         this.above = els;
                     }
-                    this.yvel = y - this.y;
+                    this.yvel = y - this.y - ys;
                     break;
                 }
             }
