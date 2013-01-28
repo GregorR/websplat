@@ -19,7 +19,7 @@
 
 module WebSplat {
     module Turns {
-        class MoveTurnIOHandler extends IO.IOHandler {
+        class MovePhaseIOHandler extends IO.IOHandler {
             // override all or any of these
             public onkeydown(key: number) {
                 if (player === null) return true;
@@ -41,16 +41,7 @@ module WebSplat {
                         }
                         break;
 
-                    case 40: // down
-                        if (player.on !== null) {
-                            player.mode = "jfc";
-                            player.frame = 0;
-                            for (var i = 0; i < player.on.length; i++) {
-                                player.thru[player.on[i].wpID] = true;
-                            }
-                            player.on = null;
-                        }
-                        break;
+                    case 69: // e
                 }
                 return false;
             }
@@ -71,17 +62,11 @@ module WebSplat {
                             player.xaccmax = null;
                         }
                         break;
-
-                    case 38: // up
-                        break;
-
-                    case 40: // down
-                        break;
                 }
                 return false;
             }
         }
 
-        IO.ioHandler = new MoveTurnIOHandler();
+        IO.ioHandler = new MovePhaseIOHandler();
     }
 }
