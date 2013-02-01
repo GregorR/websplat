@@ -125,6 +125,18 @@ module WebSplat {
                 conf.maxX = maxX;
                 conf.maxY = maxY;
 
+                // now add a new element to the bottom to prevent infinite fall
+                var bottomEl: any = document.createElement("div");
+                bottomEl.style.position = "absolute";
+                bottomEl.style.left = "0px";
+                bottomEl.style.width = maxX + "px";
+                bottomEl.style.top = maxY + "px";
+                bottomEl.style.height = "1px";
+                bottomEl.style.visibility = "hidden";
+                document.body.appendChild(bottomEl);
+                bottomEl.wpThruable = true;
+                addElementPosition(bottomEl);
+
                 then();
             });
         });
@@ -333,7 +345,7 @@ module WebSplat {
     
     // add an element at a position
     export function addElementPosition(el: any) {
-        el.wpID = curWPID++;
+        if (!("wpID" in el)) el.wpID = curWPID++;
 
         var scrollTop = document.documentElement.scrollTop ||
             document.body.scrollTop;

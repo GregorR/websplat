@@ -41,6 +41,21 @@ module WebSplat {
                         }
                         break;
 
+                    case 40: // down
+                        if (player.on !== null) {
+                            var thru = 0;
+                            for (var i = 0; i < player.on.length; i++) {
+                                var el = player.on[i];
+                                if (el.wpThruable) {
+                                    player.thru[el.wpID] = true;
+                                    thru++;
+                                }
+                            }
+                            if (thru === player.on.length)
+                                player.on = null;
+                        }
+                        break;
+
                     case 69: // e
                 }
                 return false;
