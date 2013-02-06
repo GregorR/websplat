@@ -135,6 +135,7 @@ module WebSplat {
                 bottomEl.style.visibility = "hidden";
                 document.body.appendChild(bottomEl);
                 bottomEl.wpThruable = true;
+                bottomEl.wpUndestroyable = true;
                 addElementPosition(bottomEl);
 
                 then();
