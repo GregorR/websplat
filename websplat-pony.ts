@@ -25,7 +25,7 @@ module WebSplat {
     export var curPony = 0;
 
     var ponyConf = {
-        ponies: ["pp2."],
+        ponies: ["base."],
         moveSpeed: 3,
         pointsPerKill: 500,
         edgeDetectDist: 5,
@@ -34,18 +34,18 @@ module WebSplat {
 
     var ponyImageSets = {
         r: <ImageSet> {
-            frames: 16,
+            frames: 1,
             frameRate: 3,
-            width: 53,
-            height: 53,
-            bb: [23, 39, 31, 35]
+            width: 50,
+            height: 50,
+            bb: [16, 16+17, 25, 25+7],
         },
         c: <ImageSet> {
-            frames: 32,
+            frames: 1,
             frameRate: 3,
-            width: 82,
-            height: 58,
-            bb: [36, 68, 37, 40], // make this fit with r
+            width: 50,
+            height: 50,
+            bb: [16, 16+17, 25, 25+7],
         }
     }
 

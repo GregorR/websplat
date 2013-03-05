@@ -20,7 +20,6 @@
 module WebSplat {
     module Turns {
         class MovePhaseIOHandler extends IO.IOHandler {
-            // override all or any of these
             public onkeydown(key: number) {
                 if (player === null) return true;
                 switch (key) {

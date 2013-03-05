@@ -31,16 +31,16 @@ module WebSplat {
         r: <ImageSet> {
             frames: 1,
             frameRate: 3,
-            width: 53,
-            height: 53,
-            bb: [23, 39, 31, 35]
+            width: 50,
+            height: 50,
+            bb: [16, 16+17, 25, 25+7],
         }
     };
 
     function Rocket(firedBy) {
         this.expended = false;
         this.firedBy = firedBy;
-        Sprite.call(this, "pp2.", rocketLauncherImageSets, "r", "r", true, false);
+        Sprite.call(this, "base.", rocketLauncherImageSets, "r", "r", true, false);
         this.slowxacc = 0;
         this.lifespan = bazMaxAge;
         this.ownGravity = 0.5;

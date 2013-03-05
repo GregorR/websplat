@@ -64,7 +64,7 @@
         if (src.match(/\/\//)) {
             script.src = src;
         } else {
-            script.src = "http://websplat.bitbucket.org/2/websplat/" + src;
+            script.src = "http://localhost:8080/" + src + "?" + (new Date().getTime() + Math.random());
         }
         head.appendChild(script);
 
