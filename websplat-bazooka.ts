@@ -33,7 +33,7 @@ module WebSplat {
             frameRate: 3,
             width: 50,
             height: 50,
-            bb: [16, 16+17, 25, 25+7],
+            bb: [16, 16+17, 25, 25+9],
         }
     };
 
