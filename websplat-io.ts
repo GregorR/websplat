@@ -20,13 +20,31 @@ module WebSplat {
     export module IO {
         export class IOHandler {
             // override all or any of these
+            public activate() { return true; }
+            public deactivate() {}
             public onkeydown(key: number) { return true; }
             public onkeyup(key: number) { return true; }
-            public onmousedown() { return true; }
-            public onmouseup() { return true; }
+            public onmousedown(ev: JQueryEventObject) { return true; }
+            public onmouseup(ev: JQueryEventObject) { return true; }
+            public onclick(ev: JQueryEventObject) { return true; }
         }
 
-        export var ioHandler: IOHandler = null;
+        var ioHandler: IOHandler = null;
+
+        export function setIOHandler(to: IOHandler) {
+            if (ioHandler !== null)
+                unsetIOHandler();
+            if (to !== null) {
+                ioHandler = to;
+                if (!to.activate())
+                    ioHandler = null;
+            }
+        }
+
+        export function unsetIOHandler() {
+            ioHandler.deactivate();
+            ioHandler = null;
+        }
 
         var keysDown: any = {};
 
@@ -64,6 +82,7 @@ module WebSplat {
                     if (ioHandler.onkeydown(key)) {
                         return true;
                     } else {
+                        ev.preventDefault();
                         ev.stopPropagation();
                         return false;
                     }
@@ -81,6 +100,7 @@ module WebSplat {
                     if (ioHandler.onkeyup(key)) {
                         return true;
                     } else {
+                        ev.preventDefault();
                         ev.stopPropagation();
                         return false;
                     }
@@ -89,6 +109,45 @@ module WebSplat {
             }
             $(document.body).keyup(keyup);
             $(window).keyup(keyup);
+
+            $(document.body).mousedown(function(ev) {
+                if (ioHandler) {
+                    if (ioHandler.onmousedown(ev)) {
+                        return true;
+                    } else {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            $(document.body).mouseup(function(ev) {
+                if (ioHandler) {
+                    if (ioHandler.onmouseup(ev)) {
+                        return true;
+                    } else {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            $(document.body).click(function(ev) {
+                if (ioHandler) {
+                    if (ioHandler.onclick(ev)) {
+                        return true;
+                    } else {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        return false;
+                    }
+                }
+                return true;
+            });
         });
     }
 }
