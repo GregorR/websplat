@@ -29,7 +29,7 @@ module WebSplat {
             public onclick(ev: JQueryEventObject) { return true; }
         }
 
-        export var ioHandler: IOHandler = null;
+        var ioHandler: IOHandler = null;
 
         export function setIOHandler(to: IOHandler) {
             if (ioHandler !== null)

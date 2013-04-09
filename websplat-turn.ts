@@ -81,6 +81,6 @@ module WebSplat {
             }
         }
 
-        IO.ioHandler = new MovePhaseIOHandler();
+        IO.setIOHandler(new MovePhaseIOHandler());
     }
 }
