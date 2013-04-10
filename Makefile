@@ -4,8 +4,8 @@ TSC_FLAGS=-c
 TS_FILES=\
     websplat.ts \
     websplat-pony.ts \
-    websplat-bazooka.ts \
     websplat-io.ts \
+    websplat-weapon.ts \
     websplat-turn.ts
 
 JS_FILES=$(TS_FILES:.ts=.js)

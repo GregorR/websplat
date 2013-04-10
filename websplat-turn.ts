@@ -19,7 +19,26 @@
 
 module WebSplat {
     module Turns {
+        /* Turn is in four phases: Move, select, fire, effect:
+         * Move:
+         *   Move the player on the screen. Advance by pressing 'e'.
+         *
+         * Select:
+         *   Choose a weapon to fire. Not a normal I/O handler, only displays a
+         *   dialog.
+         *
+         * Fire:
+         *   Fire a weapon. I/O handler per weapon provided by WebSplat.Weapon.
+         *
+         * Effect:
+         *   Wait for the effect of the weapon to complete before advancing to
+         *   the next turn in the move phase.
+         */
         class MovePhaseIOHandler extends IO.IOHandler {
+            constructor() {
+                super(null, null);
+            }
+
             public onkeydown(key: number) {
                 if (player === null) return true;
                 switch (key) {
@@ -81,6 +100,17 @@ module WebSplat {
             }
         }
 
-        IO.setIOHandler(new MovePhaseIOHandler());
+        export var theMovePhaseIOHandler = new MovePhaseIOHandler();
+        IO.setIOHandler(theMovePhaseIOHandler);
+
+        class SelectPhaseIOHandler extends IO.IOHandler {
+            constructor() {
+                super(null, null);
+            }
+        }
+
+        export var theSelectPhaseIOHandler = new SelectPhaseIOHandler();
+        theMovePhaseIOHandler.next = theSelectPhaseIOHandler;
+        theSelectPhaseIOHandler.prev = theMovePhaseIOHandler;
     }
 }

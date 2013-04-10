@@ -19,6 +19,25 @@
 module WebSplat {
     export module IO {
         export class IOHandler {
+            constructor (public prev: IOHandler, public next: IOHandler) {}
+
+            // for use primarily by children
+            public regress() {
+                if (this.prev !== null) {
+                    setIOHandler(this.prev);
+                    return true;
+                }
+                return false;
+            }
+
+            public advance() {
+                if (this.next !== null) {
+                    setIOHandler(this.next);
+                    return true;
+                }
+                return false;
+            }
+
             // override all or any of these
             public activate() { return true; }
             public deactivate() {}
@@ -27,6 +46,10 @@ module WebSplat {
             public onmousedown(ev: JQueryEventObject) { return true; }
             public onmouseup(ev: JQueryEventObject) { return true; }
             public onclick(ev: JQueryEventObject) { return true; }
+        }
+
+        export interface IOHandlerConstructor {
+            new(prev: IOHandler, next: IOHandler): IOHandler;
         }
 
         var ioHandler: IOHandler = null;
