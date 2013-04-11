@@ -108,7 +108,7 @@ module WebSplat {
 
         class SelectPhaseIOHandler extends IO.IOHandler {
             private selector: HTMLElement = null;
-            private sselect: HTMLSelectElement = null;
+            private b0: HTMLElement = null;
 
             constructor() {
                 super(null, null);
@@ -117,36 +117,26 @@ module WebSplat {
             public activate() {
                 // make the selector panel
                 if (this.selector === null) {
+                    var hThis = this;
                     var selector = document.createElement("div");
-                    var sselect = <HTMLSelectElement> document.createElement("select");
-                    var option = document.createElement("option");
-                    option.innerHTML = "Choose a weapon";
-                    sselect.appendChild(option);
                     for (var w = 0; w < Weapon.weapons.length; w++) {
                         var weapon = Weapon.weapons[w];
-                        var option = document.createElement("option");
-                        option.innerHTML = weapon.name;
-                        sselect.appendChild(option);
+                        var button = document.createElement("button");
+                        button.innerHTML = weapon.name;
+                        button.addEventListener("click", (function(w) { return function(ev) {
+                            hThis.next = new (Weapon.weapons[w].ioHandler)(hThis, theMovePhaseIOHandler);
+                            hThis.advance();
+                        }; })(w));
+
+                        selector.appendChild(button);
+                        if (w === 0) this.b0 = button;
                     }
-                    selector.appendChild(sselect);
-
-                    var hThis = this;
-                    sselect.addEventListener("change", function(ev) {
-                        var wpIdx = sselect.selectedIndex - 1;
-                        if (wpIdx < 0) return;
-
-                        // choose this weapon
-                        hThis.next = new (Weapon.weapons[wpIdx].ioHandler)(hThis, theMovePhaseIOHandler);
-                        hThis.advance();
-                    });
 
                     this.selector = selector;
-                    this.sselect = sselect;
                 }
 
-                this.sselect.selectedIndex = 0;
                 wpDisplayMessage(this.selector);
-                this.sselect.focus();
+                this.b0.focus();
                 return true;
             }
 
