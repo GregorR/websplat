@@ -16,6 +16,7 @@
 
 ///<reference path="websplat.ts" />
 ///<reference path="websplat-io.ts" />
+///<reference path="websplat-weapon.ts" />
 
 module WebSplat {
     module Turns {
@@ -73,8 +74,6 @@ module WebSplat {
                                 player.on = null;
                         }
                         break;
-
-                    case 69: // e
                 }
                 return false;
             }
@@ -95,6 +94,10 @@ module WebSplat {
                             player.xaccmax = null;
                         }
                         break;
+
+                    case 69: // e
+                        this.advance();
+                        break;
                 }
                 return false;
             }
@@ -104,9 +107,66 @@ module WebSplat {
         IO.setIOHandler(theMovePhaseIOHandler);
 
         class SelectPhaseIOHandler extends IO.IOHandler {
+            private selector: HTMLElement = null;
+            private sselect: HTMLSelectElement = null;
+
             constructor() {
                 super(null, null);
             }
+
+            public activate() {
+                // make the selector panel
+                if (this.selector === null) {
+                    var selector = document.createElement("div");
+                    var sselect = <HTMLSelectElement> document.createElement("select");
+                    var option = document.createElement("option");
+                    option.innerHTML = "Choose a weapon";
+                    sselect.appendChild(option);
+                    for (var w = 0; w < Weapon.weapons.length; w++) {
+                        var weapon = Weapon.weapons[w];
+                        var option = document.createElement("option");
+                        option.innerHTML = weapon.name;
+                        sselect.appendChild(option);
+                    }
+                    selector.appendChild(sselect);
+
+                    var hThis = this;
+                    sselect.addEventListener("change", function(ev) {
+                        var wpIdx = sselect.selectedIndex - 1;
+                        if (wpIdx < 0) return;
+
+                        // choose this weapon
+                        hThis.next = new (Weapon.weapons[wpIdx].ioHandler)(hThis, theMovePhaseIOHandler);
+                        hThis.advance();
+                    });
+
+                    this.selector = selector;
+                    this.sselect = sselect;
+                }
+
+                this.sselect.selectedIndex = 0;
+                wpDisplayMessage(this.selector);
+                return true;
+            }
+
+            public deactivate() {
+                wpDisplayMessage();
+            }
+
+            public onkeyup(key: number) {
+                if (player === null) return true;
+                switch (key) {
+                    case 81: // q
+                        this.regress();
+                        break;
+
+                    case 69: // e
+                        this.advance();
+                        break;
+                }
+                return false;
+            }
+
         }
 
         export var theSelectPhaseIOHandler = new SelectPhaseIOHandler();

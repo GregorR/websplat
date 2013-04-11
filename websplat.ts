@@ -21,7 +21,7 @@
 //<style eqeqeq="on" />
 
 // from loader.js
-declare function wpDisplayMessage(): void;
+declare var wpDisplayMessage: any;
 
 module WebSplat {
     // FIXME: temporary

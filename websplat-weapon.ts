@@ -19,15 +19,15 @@
 ///<reference path="websplat-pony.ts" />
 
 module WebSplat {
-    module Weapon {
-        export class Weapon {
+    export module Weapon {
+        export class WeaponW {
             constructor(
                 public name: string,
                 public ioHandler: IO.IOHandlerConstructor
                 ) {}
         }
 
-        export var weapons: Weapon[] = [];
+        export var weapons: WeaponW[] = [];
 
         // First weapon is the conventional bazooka
         module Bazooka {
@@ -185,6 +185,8 @@ module WebSplat {
                     addSprite(rocket);
                     this.midFire = true;
 
+                    this.advance();
+
                     return false;
                 }
 
@@ -192,7 +194,7 @@ module WebSplat {
             }
 
             weapons.push(
-                new Weapon("Bazooka", BazookaFireIOHandler)
+                new WeaponW("Bazooka", BazookaFireIOHandler)
                 );
         }
     }
