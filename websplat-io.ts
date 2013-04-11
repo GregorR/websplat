@@ -44,6 +44,7 @@ module WebSplat {
             public onkeydown(key: number) { return true; }
             public onkeyup(key: number) { return true; }
             public onmousedown(ev: JQueryEventObject) { return true; }
+            public onmousemove(ev: JQueryEventObject) { return true; }
             public onmouseup(ev: JQueryEventObject) { return true; }
             public onclick(ev: JQueryEventObject) { return true; }
         }
@@ -95,7 +96,7 @@ module WebSplat {
         }
 
         addHandler("postload", function() {
-            var keydown = function(ev) {
+            var keydown = function(ev: KeyboardEvent) {
                 if (ev.ctrlKey || ev.altKey || ev.metaKey) return true;
 
                 var key = translateKey(ev.which);
@@ -115,7 +116,7 @@ module WebSplat {
             $(document.body).keydown(keydown);
             $(window).keydown(keydown);
 
-            var keyup = function(ev) {
+            var keyup = function(ev: KeyboardEvent) {
                 var key = translateKey(ev.which);
                 markKeyUp(key);
 
@@ -136,6 +137,19 @@ module WebSplat {
             $(document.body).mousedown(function(ev) {
                 if (ioHandler) {
                     if (ioHandler.onmousedown(ev)) {
+                        return true;
+                    } else {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            $(document.body).mousemove(function(ev) {
+                if (ioHandler) {
+                    if (ioHandler.onmousemove(ev)) {
                         return true;
                     } else {
                         ev.preventDefault();

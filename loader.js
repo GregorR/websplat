@@ -96,6 +96,7 @@
             "http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js",
             "websplat.js",
             "websplat-pony.js",
+            "websplat-line.js",
             "websplat-io.js",
             "websplat-weapon.js",
             "websplat-turn.js",

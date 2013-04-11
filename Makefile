@@ -4,6 +4,7 @@ TSC_FLAGS=-c
 TS_FILES=\
     websplat.ts \
     websplat-pony.ts \
+    websplat-line.ts \
     websplat-io.ts \
     websplat-weapon.ts \
     websplat-turn.ts

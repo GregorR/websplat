@@ -15,8 +15,9 @@
  */
 
 ///<reference path="websplat.ts" />
-///<reference path="websplat-io.ts" />
 ///<reference path="websplat-pony.ts" />
+///<reference path="websplat-line.ts" />
+///<reference path="websplat-io.ts" />
 
 module WebSplat {
     export module Weapon {
@@ -137,20 +138,53 @@ module WebSplat {
                     super(prev, next);
                 }
 
+                private line: Line = new Line();
+
                 private mdStart: number = null; // mouse-down start
+                private ivID: number = 0; // ID of setInterval used
+                private mx: number = 0; // last seen mouse x
+                private my: number = 0; // and y
+
                 private firing: any = null;
                 private midFire = false;
+
+                public deactivate() {
+                    this.line.destroy();
+                }
 
                 public onmousedown(ev) {
                     if (this.firing || this.midFire)
                         return true;
+
+                    var iothis = this;
                     this.mdStart = new Date().getTime();
+                    this.mx = ev.pageX;
+                    this.my = ev.pageY;
+                    this.ivID = setInterval(function() {
+                        var bazTime = new Date().getTime() - iothis.mdStart;
+                        bazTime /= bazPowerupTime;
+                        if (bazTime > 1.0) bazTime = 1.0;
+                        bazTime = bazTime * 0.75 + 0.25;
+                        iothis.line.drawBar(player.x, player.y, iothis.mx, iothis.my,
+                            255, 0, 0, 2, bazTime * 128,
+                              0, 0, 0, 3, 128);
+                    }, 15);
+
                     return false;
+                }
+
+                public onmousemove(ev) {
+                    if (this.mdStart === null) return true;
+                    this.mx = ev.pageX;
+                    this.my = ev.pageY;
+                    return true;
                 }
 
                 public onmouseup(ev) {
                     if (player === null) return true;
                     if (this.mdStart === null) return true;
+
+                    clearInterval(this.ivID);
 
                     // how long have we been holding it down?
                     var bazTime = new Date().getTime() - this.mdStart;

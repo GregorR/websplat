@@ -146,6 +146,7 @@ module WebSplat {
 
                 this.sselect.selectedIndex = 0;
                 wpDisplayMessage(this.selector);
+                this.sselect.focus();
                 return true;
             }
 
