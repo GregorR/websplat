@@ -41,7 +41,7 @@ module WebSplat {
             this.canvas.style.top = "0px";
             this.canvas.width = 0;
             this.canvas.height = 0;
-            this.canvas.style.zIndex = "100000";
+            this.canvas.style.zIndex = conf.zIndexes.ui;
             document.body.appendChild(this.canvas);
             this.ctx = this.canvas.getContext("2d");
             this.setLineStyle(255, 0, 0, 3);

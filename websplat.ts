@@ -24,16 +24,6 @@
 declare var wpDisplayMessage: any;
 
 module WebSplat {
-    // FIXME: temporary
-    export var playerIndicator: any = document.createElement("div");
-    playerIndicator.style.position = "absolute";
-    playerIndicator.style.zIndex = "1000000";
-    playerIndicator.style.background = "white";
-    playerIndicator.style.color = "black"
-    playerIndicator.style.border = "1px solid red";
-    playerIndicator.style.padding = "2px 2px 2px 2px";
-    playerIndicator.innerHTML = "Player";
-
     export var player: Sprite = null;
 
     // configuration:
@@ -61,12 +51,29 @@ module WebSplat {
         // time to be invincible for
         invTime: 1000,
 
+        // various z-indexes
+        zIndexes: {
+            playerIndicator:    "1000000",
+            sprite:             "1000100",
+            ui:                 "1000200"
+        },
+
         imageBase: "http://localhost:8080/imgs/",
 
         // auto-filled
         maxX: 0,
         maxY: 0
     };
+
+    // FIXME: temporary
+    export var playerIndicator: any = document.createElement("div");
+    playerIndicator.style.position = "absolute";
+    playerIndicator.style.zIndex = conf.zIndexes.playerIndicator;
+    playerIndicator.style.background = "white";
+    playerIndicator.style.color = "black"
+    playerIndicator.style.border = "1px solid red";
+    playerIndicator.style.padding = "2px 2px 2px 2px";
+    playerIndicator.innerHTML = "Player";
 
     // handlers:
     export var handlers = {
@@ -746,7 +753,7 @@ module WebSplat {
     
             this.el.style.color = "black";
             this.el.style.position = "absolute";
-            this.el.style.zIndex = "1000000";
+            this.el.style.zIndex = conf.zIndexes.sprite;
             this.el.style.fontSize = "20px";
             document.body.appendChild(this.el);
     
