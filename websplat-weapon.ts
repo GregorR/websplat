@@ -165,7 +165,9 @@ module WebSplat {
                         bazTime /= bazPowerupTime;
                         if (bazTime > 1.0) bazTime = 1.0;
                         bazTime = bazTime * 0.75 + 0.25;
-                        iothis.line.drawBar(player.x, player.y, iothis.mx, iothis.my,
+                        iothis.line.drawBar(
+                            Math.round(player.x + player.w/2), Math.round(player.y),
+                            iothis.mx, iothis.my,
                             255, 0, 0, 2, bazTime * 128,
                               0, 0, 0, 3, 128);
                     }, 15);
