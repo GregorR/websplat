@@ -168,8 +168,8 @@ module WebSplat {
                         iothis.line.drawBar(
                             Math.round(player.x + player.w/2), Math.round(player.y),
                             iothis.mx, iothis.my,
-                            255, 0, 0, 2, bazTime * 128,
-                              0, 0, 0, 3, 128);
+                            255, 0, 0, 3, bazTime * 128,
+                              0, 0, 0, 9, 128);
                     }, 15);
 
                     return false;
